@@ -46,7 +46,7 @@
 | dsh-git-identity | `@loserfox/git-identity` | <https://github.com/LoserFox/dsh-git-identity> | link（零依赖零构建） | bundle |
 | plugin-console | `@dsh-external/plugin-console` | <https://github.com/vlln/plugin-registry>（子包 packages/plugin/console） | link + 补 yaml 依赖 | bundle |
 | dsh-toolkit | `@deepseek-ai/dsh-toolkit` | <https://github.com/omdsh-dev/dsh-toolkit> | link + 构建（10 子包，清 lockfile 后 npm install） | bundle |
-| dsh-sidechain | `@dsh-external/dsh-sidechain` | <https://github.com/Buyi-wsgzg/dsh-sidechain> | link + pnpm 构建 + 裸 schemastery 别名 | bundle（客户端依赖 upstream-fixes shim） |
+| dsh-sidechain | `@dsh-external/dsh-sidechain` | <https://github.com/Buyi-wsgzg/dsh-sidechain> | link + pnpm 构建 + 裸 schemastery 别名 | bundle（客户端依赖 upstream-fixes shim；**默认禁用**，见 DISABLED.md） |
 | dsh-upstream-fixes | `@dsh-external/dsh-upstream-fixes` | <https://github.com/qincaizheng/dsh-upstream-fixes> | git clone + link + **手动跑 install-aliases.mjs** | bundle（**必装修复层**，见 INSTALL.md §6） |
 | dsh-mcp-manager | `dsh-mcp-manager` | <https://github.com/hyqhyq3/dsh-mcp-manager> | link（lib 已提交零依赖） | bundle |
 | dsh-paste-input | `@dsh-community/dsh-paste-input` | <https://github.com/lhh010/dsh-paste-input> | link（lib 已提交零依赖） | 纯插件无 bundle，**需手动 insert 行** |

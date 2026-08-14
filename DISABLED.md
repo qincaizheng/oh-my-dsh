@@ -8,3 +8,4 @@
 |---|---|---|---|
 | `ui-dsh-aionui-panel` | dsh-aionui-panel（右侧面板：文件树 + 预览） | `@linxin666/dsh-web-ui-all`（聚合包内） | 删除 `~/.dsh/profiles/web/cordis.patch.yml` 末尾的 `- id: ui-dsh-aionui-panel` + `disabled: true` 两行 → 重启 `dsh web` → 浏览器硬刷新 |
 | `live-stats` | dsh-live-stats（输入框下方实时 token / TPS 统计） | `@linxin666/dsh-web-ui-all`（聚合包内） | 删除 `~/.dsh/profiles/web/cordis.patch.yml` 末尾的 `- id: live-stats` + `disabled: true` 两行 → 重启 `dsh web` → 浏览器硬刷新 |
+| `dsh-sidechain` | dsh-sidechain（侧链面板：`/side` 与 `/btw` 子代理） | `@dsh-external/dsh-sidechain`（源码 link，见 PLUGINS.md C 组） | 若已被禁用：删除 `~/.dsh/profiles/web/cordis.patch.yml` 末尾的 `- id: dsh-sidechain` + `disabled: true` 两行 → 重启 `dsh web`；若已卸载：按 PLUGINS.md C 组重新安装后再重启 |

@@ -118,10 +118,10 @@ node $SRC/dsh-upstream-fixes/scripts/install-aliases.mjs
 
 ### 2.4 禁用清单处理（每次安装/更新后执行）
 
-先读 [DISABLED.md](./DISABLED.md) 的禁用清单。对清单里每条（把表格「插件 id」列逐个代入；当前清单：`ui-dsh-aionui-panel`、`live-stats`）：检查本机组合树里是否存在对应 id（存在且未禁用才需要处理）：
+先读 [DISABLED.md](./DISABLED.md) 的禁用清单。对清单里每条（把表格「插件 id」列逐个代入；当前清单：`ui-dsh-aionui-panel`、`live-stats`、`dsh-sidechain`）：检查本机组合树里是否存在对应 id（存在且未禁用才需要处理；插件已被卸载的不存在，跳过）：
 
 ```bash
-for id in ui-dsh-aionui-panel live-stats; do
+for id in ui-dsh-aionui-panel live-stats dsh-sidechain; do
   echo "== $id =="
   dsh web --dump-config 2>&1 | grep "id: $id"
 done
@@ -135,6 +135,9 @@ done
   disabled: true
 
 - id: live-stats
+  disabled: true
+
+- id: dsh-sidechain
   disabled: true
 ```
 
