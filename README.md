@@ -1,5 +1,7 @@
 # oh-my-dsh — DSH 整合包
 
+[English](./README.en.md) | 中文
+
 DeepSeek Harness（DSH）一键整合包：14 组精选插件 + 开箱配置，覆盖 Web UI 全家桶、编码工具链、权限 auto 档、`/btw` 侧问与第三方插件兼容修复层。
 
 ## 包含内容
@@ -27,8 +29,9 @@ DeepSeek Harness（DSH）一键整合包：14 组精选插件 + 开箱配置，�
 
 ```text
 .
-├── README.md     # 本文件：整合包说明 + 交给 AI 的安装提示词
-└── INSTALL.md    # 权威安装手册：清单 / 步骤 / 配置 / 修复 / 验证 / 回滚
+├── README.md      # 中文说明 + 交给 AI 的安装提示词
+├── README.en.md   # English version of README.md
+└── INSTALL.md     # 权威安装手册：清单 / 步骤 / 配置 / 修复 / 验证 / 回滚
 ```
 
 ## 注意事项
