@@ -6,26 +6,14 @@ One-command integration pack for DeepSeek Harness (DSH): 17 curated plugin group
 
 ## What's inside
 
-| Category | Plugins |
-|---|---|
-| Web UI suite | ssh · task-board · aionui-panel · git-graph · live-stats · pet · remote-web-ui · web-ui-settings · skin-center |
-| Coding workbench | dsh-better-sidebar (files/terminal/Git sidebar) · dsh-at-file (@file mentions) · dsh-web-review (web preview & annotations) · dsh-openpencil (design preview) · dsh-toolkit (10 tools) · dsh-git-identity (commit identity) |
-| Vision | dsh-vision-toolkit (screenshot OCR / UI restoration) |
-| Multi-agent | dsh-agent-teams |
-| Permission extensions | dsh-auto-approval (two-state auto classifier) + auto / auto-review presets |
-| Side-asks | dsh-sidechain (`/btw` one-shot side question, `/side` persistent side thread) |
-| Plugin management | plugin-console (browser panel for profile plugin state) |
-| MCP | dsh-mcp-manager (Settings → MCP page: stdio / SSE servers, OAuth PKCE + dynamic client registration) |
-| Input | dsh-paste-input (Ctrl+V paste / drag & drop / file picker, files copied into the session workspace) |
-| Annotations | dsh-annotation (select assistant text → annotate → send; the model replies to each annotation by number) |
-| Fix layer | dsh-upstream-fixes (repairs two boot-breaking bugs in dsh-auto-approval and dsh-sidechain — **required**) |
+See [PLUGINS.md](./PLUGINS.md) for the full, authoritative plugin list (package name / source / install method / mount per entry).
 
 ## Quick start
 
 The authoritative installation manual is [INSTALL.md](./INSTALL.md). Hand the prompt below to any AI / Agent and it will read the manual and perform the full install:
 
 ```text
-Read https://github.com/qincaizheng/oh-my-dsh/INSTALL.md and treat it as the single authoritative installation manual. Install and configure the full integration pack on this machine's DeepSeek Harness (dsh web) environment: install every listed plugin, apply the config additions, run the repairs and verifications from the manual, restart dsh web — do not skip any plugin or verification step — and report the result back to me.
+Read https://github.com/qincaizheng/oh-my-dsh/INSTALL.md and treat it as the single authoritative installation manual. Install and configure the full integration pack on this machine's DeepSeek Harness (dsh web) environment: compare PLUGINS.md against this machine's installed plugins first, install only the missing plugins (skip everything already installed), apply the config additions, run the repairs and verifications from the manual, restart dsh web, and report the result back to me.
 ```
 
 ## Repository layout
@@ -34,7 +22,8 @@ Read https://github.com/qincaizheng/oh-my-dsh/INSTALL.md and treat it as the sin
 .
 ├── README.md      # English intro (default) + install prompt for AI agents
 ├── README.zh.md   # Chinese version of README.md
-└── INSTALL.md     # Authoritative manual: checklist / steps / config / repairs / verification / rollback
+├── PLUGINS.md     # Authoritative plugin list: package name / source / install method / mount
+└── INSTALL.md     # Installation manual: compare → install missing → config → verify → rollback
 ```
 
 ## Notes

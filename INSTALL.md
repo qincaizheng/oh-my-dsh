@@ -1,6 +1,6 @@
 # DSH 整合包 · 安装指南（给执行安装的模型/Agent 看）
 
-> 目标读者：负责部署本整合包的 AI 模型。本文是唯一权威清单：从哪装、怎么装、装什么、怎么验证。
+> 目标读者：负责部署本整合包的 AI 模型。本文是安装手册（从哪装、怎么装、怎么验证）；**插件清单的唯一权威是 [PLUGINS.md](./PLUGINS.md)**。
 > 目标环境：已装 DSH（`dsh web` 可跑），Node ≥ 20，pnpm ≥ 10，web profile 位于 `~/.dsh/profiles/web/`。
 
 ## 0. 总原则
@@ -9,52 +9,31 @@
 2. 纯 cordis 插件（无 `dsh.bundle`，如 dsh-better-sidebar）必须额外在 profile 的 `cordis.patch.yml` 写 insert 挂载行。
 3. **装完全部插件后必须重启 `dsh web` 并硬刷新浏览器**（Cmd/Ctrl+Shift+R）才生效。
 4. 源码插件常见三个坑，通用修复见 §4。
+5. **幂等安装**：每次执行先按 §1 对比本机已装插件，**只安装缺失项**；已安装的条目一律跳过，不重装、不重复写配置。
 
-## 1. 安装清单（当前整合包 = 14 组）
+## 1. 插件清单与本机对比（先做，每次必做）
 
-### A. npm 注册表发布（优先，一条命令）
+完整插件清单（唯一权威）在 [PLUGINS.md](./PLUGINS.md)：每个条目含「包名（profile 依赖键）」「来源」「安装方式」「挂载」四列。
 
-| 插件 | 包名 | 用途 |
-|---|---|---|
-| dsh-web-review | `@canglongcl/dsh-web-review@^0.1.0` | 网页预览 + 元素批注，AI 按可视化反馈改前端源码 |
-| dsh-openpencil | `@zseven-w/dsh-openpencil@0.1.0-rc.1` | 设计稿预览与编辑 |
-| dsh-auto-approval | `dsh-auto-approval@^0.1.0`（**裸名**） | 权限 auto 档：L0 规则 + L1 LLM 两态分类器 |
-| dsh-client-ui-auto-approval | `dsh-client-ui-auto-approval@^0.1.0`（**裸名**） | composer 旁 AA 状态芯片 |
+**每次执行都先与本机已装插件对比，只安装缺失项：**
 
-### B. 源码安装（未发布 npm）
+```bash
+# 1) 本机已装插件集合（profile 依赖键，与 PLUGINS.md 的「包名」列一一对应）
+node -e "console.log(Object.keys(require(process.env.HOME + '/.dsh/profiles/web/package.json').dependencies ?? {}).sort().join('\n'))"
 
-| 插件 | 仓库 | 备注 |
-|---|---|---|
-| dsh-better-sidebar | <https://github.com/omdsh-dev/DSH-better-sidebar> | 需 pnpm 构建；纯 cordis 插件，需 insert 行 |
-| dsh-at-file | <https://github.com/omdsh-dev/dsh-at-file> | lib 已提交，无需构建 |
-| dsh-agent-teams | <https://github.com/NanmiCoder/dsh-agent-teams> | lib 已提交 |
-| dsh-vision-toolkit | <https://github.com/Anionex/dsh-vision-toolkit> | lib 已提交；需补 saxes + schemastery 别名 |
-| dsh-git-identity | <https://github.com/LoserFox/dsh-git-identity> | 零依赖零构建 |
-| plugin-console | <https://github.com/vlln/plugin-registry>（子包 `packages/plugin/console`） | 需补 yaml 依赖 |
-| dsh-toolkit | <https://github.com/omdsh-dev/dsh-toolkit> | 需构建（10 个子工具 + meta） |
-| dsh-sidechain | <https://github.com/Buyi-wsgzg/dsh-sidechain> | 需构建；提供 `/btw` 一次性侧问与 `/side` 侧会话 |
-| dsh-upstream-fixes | <https://github.com/qincaizheng/dsh-upstream-fixes> | **必装的修复层**（见 §6，缺它会崩）；git clone + link 安装 + 手动跑别名脚本 |
-| dsh-mcp-manager | <https://github.com/hyqhyq3/dsh-mcp-manager> | lib 已提交零依赖；bundle 插件，add 即挂载（设置 → MCP 页） |
-| dsh-paste-input | <https://github.com/lhh010/dsh-paste-input> | lib 已提交零依赖；纯插件无 bundle，需手动 insert 行（见 §3） |
-| dsh-annotation | <https://github.com/dsh-external/dsh-annotation>（原组织，现 `omdsh-dev`） | 预构建零依赖；bundle 插件 add 即挂载（**勿**再手动 insert） |
-
-### C. dsh-web-ui 全家桶
-
-仓库：<https://github.com/zhu1090093659/dsh-web-ui>（clone 到 `~/.dsh/plugins/dsh-web-ui`，先 `pnpm install` 并按需 `pnpm build`）
-
-| 子包（逐个 add 本地路径） | 作用 |
-|---|---|
-| dsh-ssh | 远程 SSH 运维（侧边栏） |
-| dsh-task-board | 任务看板（cron 定时任务） |
-| dsh-aionui-panel | 右侧预览/文件树/SCM 面板 |
-| dsh-git-graph | git 提交图 |
-| dsh-live-stats | token/TPS 实时统计 |
-| dsh-pet | 桌面鲸鱼宠物 |
-| dsh-remote-web-ui | 远程 Web UI |
-| dsh-web-ui-settings | Web UI 插件组设置卡 |
-| skins/skin-center | 皮肤中心（皮肤本身可选，见 §7） |
+# 2) 逐行对照 PLUGINS.md：
+#    - 已安装的条目 → 跳过（不重装、不改配置、不重写 insert 行）
+#    - 缺失的条目   → 记下它的「安装方式」，跳到 §2 执行对应命令
+# 3) 需要手动 insert 挂载行的插件（PLUGINS.md「挂载」列标出：dsh-better-sidebar / dsh-paste-input）
+#    还要确认挂载行是否已存在，计数为 0 才追加：
+grep -c 'id: better-sidebar' ~/.dsh/profiles/web/cordis.patch.yml
+grep -c 'id: dsh-paste-input' ~/.dsh/profiles/web/cordis.patch.yml
+# 重复 insert 会导致启动报错，务必只写一次。
+```
 
 ## 2. 安装步骤
+
+> 本节命令按 §1 的对比结果**只对缺失条目执行**；全部已装的条目直接跳过本节。
 
 ### 2.1 npm 插件
 
@@ -132,7 +111,9 @@ dsh plugin --profile web add $SRC/dsh-annotation
 node $SRC/dsh-upstream-fixes/scripts/install-aliases.mjs
 ```
 
-## 3. 配置文件追加（一次性）
+## 3. 配置文件追加（一次性、幂等）
+
+> 追加前先按 §1 第 3 步 grep 检查：挂载行计数为 0 才追加；权限预设若已存在同名条目也不要重复追加。
 
 向 `~/.dsh/profiles/web/cordis.patch.yml` 追加（保留已有的 webserver 行）：
 
