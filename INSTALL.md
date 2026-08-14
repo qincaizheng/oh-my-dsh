@@ -10,6 +10,7 @@
 3. **装完全部插件后必须重启 `dsh web` 并硬刷新浏览器**（Cmd/Ctrl+Shift+R）才生效。
 4. 源码插件常见三个坑，通用修复见 §4。
 5. **幂等安装**：每次执行先按 §1 对比本机已装插件，**只安装缺失项**；已安装的条目一律跳过，不重装、不重复写配置。
+6. **禁用清单**：每次安装/更新后按 §2.4 处理 [DISABLED.md](./DISABLED.md)——清单内已安装的条目写禁用行，并在最终汇报里告知用户重新启用入口。
 
 ## 1. 插件清单与本机对比（先做，每次必做）
 
@@ -114,6 +115,30 @@ dsh plugin --profile web add $SRC/dsh-annotation
 # link: 安装不跑 postinstall —— 手动执行别名修复（同一命令可反复执行作修复）
 node $SRC/dsh-upstream-fixes/scripts/install-aliases.mjs
 ```
+
+### 2.4 禁用清单处理（每次安装/更新后执行）
+
+先读 [DISABLED.md](./DISABLED.md) 的禁用清单。对清单里每条（把表格「插件 id」列逐个代入；当前清单：`ui-dsh-aionui-panel`、`live-stats`）：检查本机组合树里是否存在对应 id（存在且未禁用才需要处理）：
+
+```bash
+for id in ui-dsh-aionui-panel live-stats; do
+  echo "== $id =="
+  dsh web --dump-config 2>&1 | grep "id: $id"
+done
+```
+
+存在 → 向 `~/.dsh/profiles/web/cordis.patch.yml` **末尾**追加该条目的禁用行。幂等：追加前先确认该 id 尚无 `disabled: true` 行（`grep -A1 'id: <条目id>' ~/.dsh/profiles/web/cordis.patch.yml` 输出含 `disabled: true` 即已处理，跳过）：
+
+```yaml
+# 禁用清单（DISABLED.md）：默认禁用，重新启用入口见该文件
+- id: ui-dsh-aionui-panel
+  disabled: true
+
+- id: live-stats
+  disabled: true
+```
+
+全部条目处理完后，**最终汇报必须包含**：被默认禁用了哪些插件、每个插件的重新启用入口（见 DISABLED.md「重新启用入口」列）。重新启用 = 删除对应禁用行后重启 `dsh web`。
 
 ## 3. 配置文件追加（一次性、幂等）
 

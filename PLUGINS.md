@@ -2,6 +2,7 @@
 
 > 整合包的完整插件列表。每个条目给出：插件、**包名（profile 依赖键）**、来源仓库、安装方式、挂载备注。
 > 安装前先按 [INSTALL.md](./INSTALL.md) §1 与本机已装插件对比，**只安装缺失项，已安装的跳过**。
+> 默认禁用清单见 [DISABLED.md](./DISABLED.md)：安装/更新后按 INSTALL.md §2.4 自动禁用对应条目，并告知用户重新启用入口。
 
 ## A. dsh-web-ui 全家桶（聚合包，npm 或仓库 link）
 
@@ -17,9 +18,9 @@
 |---|---|---|
 | dsh-ssh | `ssh` | 远程 SSH 运维面板（配置存 `~/.dsh/dsh-ssh.json`） |
 | dsh-task-board | `ui-task-board` | 任务看板 |
-| dsh-aionui-panel | `ui-dsh-aionui-panel` | 右侧预览 / 文件树 / SCM 面板 |
+| dsh-aionui-panel | `ui-dsh-aionui-panel` | 右侧预览 / 文件树 / SCM 面板（**默认禁用**，见 DISABLED.md） |
 | dsh-git-graph | `ui-git-graph` | Git 图谱 |
-| dsh-live-stats | `live-stats` | 实时 token 统计 |
+| dsh-live-stats | `live-stats` | 实时 token 统计（**默认禁用**，见 DISABLED.md） |
 | dsh-pet | `pet` | 鲸鱼娘宠物 |
 | dsh-remote-web-ui | `remote-web-ui` | 移动端远程 |
 | dsh-web-ui-settings | `ui-web-ui-settings` | 插件设置中心 |

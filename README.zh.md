@@ -13,7 +13,7 @@ DeepSeek Harness（DSH）一键整合包：16 组精选插件 + 开箱配置，�
 本仓库的权威安装手册是 [INSTALL.md](./INSTALL.md)。把下面这段提示词交给任意 AI / Agent 即可完成安装：
 
 ```text
-请阅读 https://github.com/qincaizheng/oh-my-dsh/blob/main/INSTALL.md，把它作为唯一权威的安装手册，在本机 DeepSeek Harness（dsh web）环境按手册完成整合包的全部安装与配置：先按手册 §1 对比本机已装插件、只安装缺失的插件（已安装的跳过），再应用配置追加、执行修复与验证、重启 dsh web，最后向我汇报安装结果。
+请阅读 https://github.com/qincaizheng/oh-my-dsh/blob/main/INSTALL.md，把它作为唯一权威的安装手册，在本机 DeepSeek Harness（dsh web）环境按手册完成整合包的全部安装与配置：先按手册 §1 对比本机已装插件、只安装缺失的插件（已安装的跳过），再应用配置追加、按手册处理禁用清单（DISABLED.md）并告知我禁用了哪些插件及重新启用入口、执行修复与验证、重启 dsh web，最后向我汇报安装结果。
 ```
 
 ## 目录结构
@@ -23,6 +23,7 @@ DeepSeek Harness（DSH）一键整合包：16 组精选插件 + 开箱配置，�
 ├── README.md      # 英文说明（默认）+ 交给 AI 的安装提示词
 ├── README.zh.md   # 中文说明
 ├── PLUGINS.md     # 插件清单（唯一权威）：包名 / 来源 / 安装方式 / 挂载
+├── DISABLED.md    # 默认禁用清单（安装/更新时自动处理，附重新启用入口）
 └── INSTALL.md     # 安装手册：对比本机 → 装缺失项 → 配置 → 验证 → 回滚
 ```
 
