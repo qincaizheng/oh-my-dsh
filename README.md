@@ -13,7 +13,7 @@ See [PLUGINS.md](./PLUGINS.md) for the full, authoritative plugin list (package 
 The authoritative installation manual is [INSTALL.md](./INSTALL.md). Hand the prompt below to any AI / Agent and it will read the manual and perform the full install:
 
 ```text
-Read https://github.com/qincaizheng/oh-my-dsh/INSTALL.md and treat it as the single authoritative installation manual. Install and configure the full integration pack on this machine's DeepSeek Harness (dsh web) environment: compare PLUGINS.md against this machine's installed plugins first, install only the missing plugins (skip everything already installed), apply the config additions, run the repairs and verifications from the manual, restart dsh web, and report the result back to me.
+Read https://github.com/qincaizheng/oh-my-dsh/blob/main/INSTALL.md and treat it as the single authoritative installation manual. Install and configure the full integration pack on this machine's DeepSeek Harness (dsh web) environment: compare PLUGINS.md against this machine's installed plugins first, install only the missing plugins (skip everything already installed), apply the config additions, run the repairs and verifications from the manual, restart dsh web, and report the result back to me.
 ```
 
 ## Repository layout
