@@ -2,7 +2,7 @@
 
 [English](./README.md) | 中文
 
-DeepSeek Harness（DSH）一键整合包：17 组精选插件 + 开箱配置，覆盖 Web UI 全家桶、编码工具链、权限 auto 档、`/btw` 侧问与第三方插件兼容修复层。
+DeepSeek Harness（DSH）一键整合包：16 组精选插件 + 开箱配置，覆盖 Web UI 全家桶、编码工具链、权限 auto 档、`/btw` 侧问与第三方插件兼容修复层。
 
 ## 包含内容
 
@@ -28,6 +28,6 @@ DeepSeek Harness（DSH）一键整合包：17 组精选插件 + 开箱配置，�
 
 ## 注意事项
 
-- 本整合包按 DSH 0.1.0-rc.6 实测整理；部分老插件（vision-toolkit / agent-teams / toolkit 系 rc.1 时代源码）已按 rc.6 重建/链接，**升级 DSH 后需重跑 INSTALL.md §4 的修复与构建**。
+- 本整合包按 DSH 0.1.0-rc.6 实测整理；部分老插件（agent-teams / toolkit 系 rc.1 时代源码）已按 rc.6 重建/链接，**升级 DSH 后需重跑 INSTALL.md §4 的修复与构建**。
 - 第三方插件兼容情报参考：<https://github.com/AdamPlatin123/awesome-dsh-plugins>（每日兼容矩阵）、<https://github.com/0xsline/awesome-deepseek-harness>（人工精选目录）。
 - `dsh-upstream-fixes` 是本整合包的修复层插件，修复两个真实崩溃点；未安装时重启 dsh web 会直接报错，详见 INSTALL.md §6。

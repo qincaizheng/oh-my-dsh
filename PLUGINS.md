@@ -35,7 +35,6 @@
 | dsh-better-sidebar | `dsh-better-sidebar` | <https://github.com/omdsh-dev/DSH-better-sidebar> | link + pnpm 构建（prepare 自动） | **需手动 insert 行** |
 | dsh-at-file | `dsh-at-file` | <https://github.com/omdsh-dev/dsh-at-file> | link（lib 已提交） | bundle |
 | dsh-agent-teams | `dsh-agent-teams` | <https://github.com/NanmiCoder/dsh-agent-teams> | link（依赖走 INSTALL.md §4.3 软链法） | bundle |
-| dsh-vision-toolkit | `@dsh-external/dsh-vision-toolkit` | <https://github.com/Anionex/dsh-vision-toolkit> | link + 补 saxes + 裸 schemastery 别名 | bundle |
 | dsh-git-identity | `@loserfox/git-identity` | <https://github.com/LoserFox/dsh-git-identity> | link（零依赖零构建） | bundle |
 | plugin-console | `@dsh-external/plugin-console` | <https://github.com/vlln/plugin-registry>（子包 packages/plugin/console） | link + 补 yaml 依赖 | bundle |
 | dsh-toolkit | `@deepseek-ai/dsh-toolkit` | <https://github.com/omdsh-dev/dsh-toolkit> | link + 构建（10 子包，清 lockfile 后 npm install） | bundle |
@@ -47,6 +46,6 @@
 
 ## 统计
 
-- 共 25 个包 / 17 个功能组。
+- 共 24 个包 / 16 个功能组。
 - 「挂载」为 bundle 的条目：`dsh plugin add` 后自动进 `dsh.profile.bundles`，无需其他操作。
 - 「挂载」为手动 insert 的条目（dsh-better-sidebar、dsh-paste-input）：必须在 profile `cordis.patch.yml` 写对应 insert 行（见 INSTALL.md §3），且**只写一次**。

@@ -63,7 +63,6 @@ SRC=~/.dsh/plugins
 git clone --depth 1 https://github.com/omdsh-dev/DSH-better-sidebar.git $SRC/DSH-better-sidebar
 git clone --depth 1 https://github.com/omdsh-dev/dsh-at-file.git       $SRC/dsh-at-file
 git clone --depth 1 https://github.com/NanmiCoder/dsh-agent-teams.git  $SRC/dsh-agent-teams
-git clone --depth 1 https://github.com/Anionex/dsh-vision-toolkit.git  $SRC/dsh-vision-toolkit
 git clone --depth 1 https://github.com/LoserFox/dsh-git-identity.git   $SRC/dsh-git-identity
 git clone --depth 1 https://github.com/vlln/plugin-registry.git        $SRC/plugin-registry
 git clone --depth 1 https://github.com/omdsh-dev/dsh-toolkit.git       $SRC/dsh-toolkit
@@ -83,8 +82,6 @@ git clone --depth 1 https://github.com/dsh-external/dsh-annotation.git  $SRC/dsh
 (cd $SRC/dsh-sidechain && pnpm install --no-frozen-lockfile && pnpm build)
 # toolkit（清掉上游 lockfile 再装，避免 404；再构建全部子包）
 (cd $SRC/dsh-toolkit && rm -f package-lock.json && npm install && bash scripts/build-all.sh)
-# vision-toolkit（lib 已提交，只补运行时依赖）
-(cd $SRC/dsh-vision-toolkit && npm install --no-save --legacy-peer-deps)
 # plugin-console（子包；补 yaml 依赖）
 (cd $SRC/plugin-registry/packages/plugin/console && pnpm install --config.auto-install-peers=false)
 # agent-teams（pnpm 用 --no-frozen-lockfile；其 peer 指向未发布私有包，不要整体装，只做 §4 断链修复）
@@ -97,7 +94,6 @@ git clone --depth 1 https://github.com/dsh-external/dsh-annotation.git  $SRC/dsh
 dsh plugin --profile web add $SRC/DSH-better-sidebar
 dsh plugin --profile web add $SRC/dsh-at-file
 dsh plugin --profile web add $SRC/dsh-agent-teams
-dsh plugin --profile web add $SRC/dsh-vision-toolkit
 dsh plugin --profile web add $SRC/dsh-git-identity
 dsh plugin --profile web add $SRC/plugin-registry/packages/plugin/console
 dsh plugin --profile web add $SRC/dsh-toolkit
@@ -178,13 +174,12 @@ for link in "$repo"/node_modules/@deepseek-ai/*; do
 done
 ```
 
-### 4.2 裸 `schemastery` 别名（vision-toolkit / sidechain）
+### 4.2 裸 `schemastery` 别名（sidechain）
 
 上游源码 import 的是不带 scope 的 `schemastery`：
 
 ```bash
 GLOBAL=$(npm root -g)/@deepseek-ai/dsh/node_modules/@deepseek-ai
-ln -sfn "$GLOBAL/schemastery" "$SRC/dsh-vision-toolkit/node_modules/schemastery"
 ln -sfn "$GLOBAL/schemastery" "$SRC/dsh-sidechain/node_modules/schemastery"
 ```
 
@@ -200,7 +195,7 @@ dsh web --dump-config 2>&1 | grep -c 'not found'
 
 # 2) 每个新插件宿主模块能 import
 cd ~/.dsh/profiles/web
-for pkg in @loserfox/git-identity dsh-at-file dsh-agent-teams @dsh-external/dsh-vision-toolkit \
+for pkg in @loserfox/git-identity dsh-at-file dsh-agent-teams \
            @canglongcl/dsh-web-review @zseven-w/dsh-openpencil @dsh-external/plugin-console \
            @deepseek-ai/dsh-toolkit dsh-better-sidebar dsh-auto-approval \
            @dsh-external/dsh-sidechain @dsh-external/dsh-upstream-fixes; do
@@ -247,7 +242,7 @@ dsh web --patch /tmp/test-port.yml   # 起来后 curl http://127.0.0.1:3099/ 看
 
 ## 9. 已知风险
 
-- 老插件（vision-toolkit / agent-teams / toolkit 系 rc.1 时代源码）已按本机 DSH rc.6 重建/链接；**升级 DSH 后需重跑 §4 的断链修复与构建**。
+- 老插件（agent-teams / toolkit 系 rc.1 时代源码）已按本机 DSH rc.6 重建/链接；**升级 DSH 后需重跑 §4 的断链修复与构建**。
 - 两个目录做兼容情报：<https://github.com/AdamPlatin123/awesome-dsh-plugins>（每日兼容矩阵）、<https://github.com/0xsline/awesome-deepseek-harness>。
 
 ## 10. 卸载/回滚
