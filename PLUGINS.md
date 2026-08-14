@@ -3,21 +3,28 @@
 > 整合包的完整插件列表。每个条目给出：插件、**包名（profile 依赖键）**、来源仓库、安装方式、挂载备注。
 > 安装前先按 [INSTALL.md](./INSTALL.md) §1 与本机已装插件对比，**只安装缺失项，已安装的跳过**。
 
-## A. dsh-web-ui 全家桶（同一仓库子包，link 安装）
+## A. dsh-web-ui 全家桶（聚合包，npm 或仓库 link）
 
-仓库：<https://github.com/zhu1090093659/dsh-web-ui>（clone 到 `~/.dsh/plugins/dsh-web-ui`，`pnpm install` 后逐个 `dsh plugin add <子包路径>`）
+仓库：<https://github.com/zhu1090093659/dsh-web-ui>。上游已把全家桶发布为 npm 聚合包（`@linxin666` scope）：一个依赖键装齐 9 个功能插件 + 皮肤全家桶（dsh-skins，皮肤资产内置）+ compat shim（兼容旧壳 `data-pane`/slot 挂载点）。
 
-| 插件 | 包名（依赖键） | 来源子包 | 挂载 |
-|---|---|---|---|
-| dsh-ssh | `@deepseek-ai/dsh-ssh` | packages/dsh-ssh | bundle |
-| dsh-task-board | `@deepseek-ai/dsh-client-ui-task-board` | packages/dsh-task-board | bundle |
-| dsh-aionui-panel | `@deepseek-ai/dsh-client-ui-aionui-panel` | packages/dsh-aionui-panel | bundle |
-| dsh-git-graph | `@deepseek-ai/dsh-client-ui-git-graph` | packages/dsh-git-graph | bundle |
-| dsh-live-stats | `@deepseek-ai/dsh-live-stats` | packages/dsh-live-stats | bundle |
-| dsh-pet | `@deepseek-ai/dsh-pet` | packages/dsh-pet | bundle |
-| dsh-remote-web-ui | `@deepseek-ai/dsh-remote-web-ui` | packages/dsh-remote-web-ui | bundle |
-| dsh-web-ui-settings | `@deepseek-ai/dsh-client-ui-web-ui-settings` | packages/dsh-web-ui-settings | bundle |
-| skin-center | `@deepseek-ai/dsh-client-ui-skin-center` | packages/skins/skin-center | bundle |
+| 插件 | 包名（依赖键） | 来源 | 安装方式 | 挂载 |
+|---|---|---|---|---|
+| dsh-web-ui-all（全家桶聚合） | `@linxin666/dsh-web-ui-all` | packages/dsh-web-ui-all | npm（推荐）或仓库 clone + `pnpm -r build` + `scripts/link-profile.mjs` + link | bundle（内部自动 insert 各功能插件行） |
+
+聚合包内含的功能插件（各为一条 insert 行，**无需**再单独安装，功能组不随安装方式变化）：
+
+| 插件 | 聚合内 insert id | 说明 |
+|---|---|---|
+| dsh-ssh | `ssh` | 远程 SSH 运维面板（配置存 `~/.dsh/dsh-ssh.json`） |
+| dsh-task-board | `ui-task-board` | 任务看板 |
+| dsh-aionui-panel | `ui-dsh-aionui-panel` | 右侧预览 / 文件树 / SCM 面板 |
+| dsh-git-graph | `ui-git-graph` | Git 图谱 |
+| dsh-live-stats | `live-stats` | 实时 token 统计 |
+| dsh-pet | `pet` | 鲸鱼娘宠物 |
+| dsh-remote-web-ui | `remote-web-ui` | 移动端远程 |
+| dsh-web-ui-settings | `ui-web-ui-settings` | 插件设置中心 |
+| skin-center | `ui-skin-center` | 皮肤中心（皮肤经 dsh-skins 内置，中心内切换） |
+| —（compat 桥接） | `ui-web-ui-compat` | 随聚合包内置的兼容 shim |
 
 ## B. npm 注册表发布
 
@@ -46,6 +53,6 @@
 
 ## 统计
 
-- 共 24 个包 / 16 个功能组。
+- 共 16 个依赖键包 / 16 个功能组（dsh-web-ui 全家桶合并为 1 个聚合依赖键，其 9 个功能插件仍各算 1 个功能组）。
 - 「挂载」为 bundle 的条目：`dsh plugin add` 后自动进 `dsh.profile.bundles`，无需其他操作。
 - 「挂载」为手动 insert 的条目（dsh-better-sidebar、dsh-paste-input）：必须在 profile `cordis.patch.yml` 写对应 insert 行（见 INSTALL.md §3），且**只写一次**。

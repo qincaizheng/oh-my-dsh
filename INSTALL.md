@@ -44,16 +44,24 @@ dsh plugin --profile web add dsh-auto-approval
 dsh plugin --profile web add dsh-client-ui-auto-approval
 ```
 
-### 2.2 dsh-web-ui 全家桶
+### 2.2 dsh-web-ui 全家桶（聚合包）
+
+推荐 npm 一键安装（上游已发布到 `@linxin666` scope，一个依赖键装齐 9 个功能插件 + 皮肤 + compat shim）：
 
 ```bash
-git clone https://github.com/zhu1090093659/dsh-web-ui.git ~/.dsh/plugins/dsh-web-ui
-cd ~/.dsh/plugins/dsh-web-ui && pnpm install
-# 逐个挂载（聚合包 web-ui-all 亦可，此处按当前整合包逐包挂载）
-for p in dsh-ssh dsh-task-board dsh-aionui-panel dsh-git-graph dsh-live-stats dsh-pet dsh-remote-web-ui dsh-web-ui-settings; do
-  dsh plugin --profile web add ~/.dsh/plugins/dsh-web-ui/packages/$p
-done
-dsh plugin --profile web add ~/.dsh/plugins/dsh-web-ui/packages/skins/skin-center
+dsh plugin --profile web add @linxin666/dsh-web-ui-all
+```
+
+> 首次安装若提示 `ERR_PNPM_IGNORED_BUILDS`（pnpm 拒绝依赖构建脚本），按提示把 `cloudflared` / `cpu-features` / `ssh2` 加入 profile 的 `pnpm-workspace.yaml` 的 `allowBuilds` 后重跑即可。
+
+仓库源码安装（改代码调试用，需 Node ≥ 22 + pnpm）：
+
+```bash
+SRC=~/.dsh/plugins
+git clone https://github.com/zhu1090093659/dsh-web-ui.git $SRC/dsh-web-ui
+(cd $SRC/dsh-web-ui && pnpm install --no-frozen-lockfile && pnpm -r build)
+node $SRC/dsh-web-ui/scripts/link-profile.mjs   # 把子包链接进 profile 命名空间
+dsh plugin --profile web add link:$SRC/dsh-web-ui/packages/dsh-web-ui-all
 ```
 
 ### 2.3 源码插件（通用流程）
@@ -225,12 +233,9 @@ dsh web --patch /tmp/test-port.yml   # 起来后 curl http://127.0.0.1:3099/ 看
 
 ## 7. 可选：皮肤
 
-皮肤包（qq98/ths/xp/blue-fantasy/dragon-heir/minecraft/whale-song）默认不装。需要时：
+皮肤随聚合包内置（dsh-skins：qq98/ths/xp/blue-fantasy/dragon-heir/minecraft/whale-song/miku/trading），无需单独安装，在 GUI「皮肤中心」（skin-center）内切换即可。
 
-```bash
-~/.dsh/plugins/dsh-web-ui/scripts/dsh-skin install <皮肤名>   # = dsh plugin add
-~/.dsh/plugins/dsh-web-ui/scripts/dsh-skin use <皮肤名>       # 互斥启用，热重载
-```
+旧版 `dsh-skin` CLI 已废弃。若全局 `~/.dsh/cordis.patch.yml` 残留旧 CLI 生成的皮肤管理块（`# --- dsh-skin managed ---` 段），可整块删除——它只会产生 "entry not found" 警告；皮肤切换由聚合包的皮肤中心接管。
 
 ## 8. 激活与验收
 
@@ -243,6 +248,7 @@ dsh web --patch /tmp/test-port.yml   # 起来后 curl http://127.0.0.1:3099/ 看
 ## 9. 已知风险
 
 - 老插件（agent-teams / toolkit 系 rc.1 时代源码）已按本机 DSH rc.6 重建/链接；**升级 DSH 后需重跑 §4 的断链修复与构建**。
+- dsh-web-ui 全家桶已适配当前 DSH 壳（compat shim 内置）；**升级 DSH 后若侧边栏入口不显示，先更新全家桶仓库（`git pull` + `pnpm -r build` + `scripts/link-profile.mjs`）再重启 dsh web**。
 - 两个目录做兼容情报：<https://github.com/AdamPlatin123/awesome-dsh-plugins>（每日兼容矩阵）、<https://github.com/0xsline/awesome-deepseek-harness>。
 
 ## 10. 卸载/回滚
