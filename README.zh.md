@@ -2,7 +2,7 @@
 
 [English](./README.md) | 中文
 
-DeepSeek Harness（DSH）一键整合包：16 组精选插件 + 开箱配置，覆盖 Web UI 全家桶、编码工具链、权限 auto 档、`/btw` 侧问与第三方插件兼容修复层。
+DeepSeek Harness（DSH）一键整合包：17 组精选插件 + 开箱配置，覆盖 Web UI 全家桶、编码工具链、权限 auto 档、`/btw` 侧问与第三方插件兼容修复层。
 
 ## 包含内容
 
@@ -17,6 +17,7 @@ DeepSeek Harness（DSH）一键整合包：16 组精选插件 + 开箱配置，�
 | 插件管理 | plugin-console（浏览器面板管理插件安装态） |
 | MCP | dsh-mcp-manager（设置 → MCP 页：stdio/SSE 服务器管理，OAuth PKCE + 动态客户端注册） |
 | 输入增强 | dsh-paste-input（Ctrl+V 粘贴 / 拖拽 / 选择文件，发送时复制进会话工作区） |
+| 文本批注 | dsh-annotation（选中回复文本 → 加批注 → 发送，模型按编号逐一回应并显示悬停标签） |
 | 修复层 | dsh-upstream-fixes（修复 auto-approval scoped 名与 sidechain 客户端深路径 import 两个启动崩溃点，**必装**） |
 
 ## 快速开始
