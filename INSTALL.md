@@ -34,6 +34,8 @@
 | dsh-toolkit | <https://github.com/omdsh-dev/dsh-toolkit> | 需构建（10 个子工具 + meta） |
 | dsh-sidechain | <https://github.com/Buyi-wsgzg/dsh-sidechain> | 需构建；提供 `/btw` 一次性侧问与 `/side` 侧会话 |
 | dsh-upstream-fixes | <https://github.com/qincaizheng/dsh-upstream-fixes> | **必装的修复层**（见 §6，缺它会崩）；git clone + link 安装 + 手动跑别名脚本 |
+| dsh-mcp-manager | <https://github.com/hyqhyq3/dsh-mcp-manager> | lib 已提交零依赖；bundle 插件，add 即挂载（设置 → MCP 页） |
+| dsh-paste-input | <https://github.com/lhh010/dsh-paste-input> | lib 已提交零依赖；纯插件无 bundle，需手动 insert 行（见 §3） |
 
 ### C. dsh-web-ui 全家桶
 
@@ -87,6 +89,8 @@ git clone --depth 1 https://github.com/vlln/plugin-registry.git        $SRC/plug
 git clone --depth 1 https://github.com/omdsh-dev/dsh-toolkit.git       $SRC/dsh-toolkit
 git clone --depth 1 https://github.com/Buyi-wsgzg/dsh-sidechain.git    $SRC/dsh-sidechain
 git clone --depth 1 https://github.com/qincaizheng/dsh-upstream-fixes.git $SRC/dsh-upstream-fixes
+git clone --depth 1 https://github.com/hyqhyq3/dsh-mcp-manager.git     $SRC/dsh-mcp-manager
+git clone --depth 1 https://github.com/lhh010/dsh-paste-input.git     $SRC/dsh-paste-input
 ```
 
 按需装依赖 + 构建：
@@ -118,6 +122,8 @@ dsh plugin --profile web add $SRC/plugin-registry/packages/plugin/console
 dsh plugin --profile web add $SRC/dsh-toolkit
 dsh plugin --profile web add $SRC/dsh-sidechain
 dsh plugin --profile web add $SRC/dsh-upstream-fixes
+dsh plugin --profile web add $SRC/dsh-mcp-manager
+dsh plugin --profile web add $SRC/dsh-paste-input
 
 # link: 安装不跑 postinstall —— 手动执行别名修复（同一命令可反复执行作修复）
 node $SRC/dsh-upstream-fixes/scripts/install-aliases.mjs
@@ -132,6 +138,11 @@ node $SRC/dsh-upstream-fixes/scripts/install-aliases.mjs
 - insert:
     - id: better-sidebar
       name: 'dsh-better-sidebar'
+
+# dsh-paste-input 挂载行（纯插件无 bundle，同样必须）
+- insert:
+    - id: dsh-paste-input
+      name: '@dsh-community/dsh-paste-input'
 
 # 权限预设：补 auto / auto-review 两档
 - id: permission

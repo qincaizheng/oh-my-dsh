@@ -2,7 +2,7 @@
 
 [中文](./README.zh.md) | English
 
-One-command integration pack for DeepSeek Harness (DSH): 14 curated plugin groups plus out-of-the-box configuration — the Web UI suite, a coding toolchain, the permission "auto" tier, `/btw` side-asks, and a compatibility fix layer for third-party plugins.
+One-command integration pack for DeepSeek Harness (DSH): 16 curated plugin groups plus out-of-the-box configuration — the Web UI suite, a coding toolchain, the permission "auto" tier, `/btw` side-asks, and a compatibility fix layer for third-party plugins.
 
 ## What's inside
 
@@ -15,6 +15,8 @@ One-command integration pack for DeepSeek Harness (DSH): 14 curated plugin group
 | Permission extensions | dsh-auto-approval (two-state auto classifier) + auto / auto-review presets |
 | Side-asks | dsh-sidechain (`/btw` one-shot side question, `/side` persistent side thread) |
 | Plugin management | plugin-console (browser panel for profile plugin state) |
+| MCP | dsh-mcp-manager (Settings → MCP page: stdio / SSE servers, OAuth PKCE + dynamic client registration) |
+| Input | dsh-paste-input (Ctrl+V paste / drag & drop / file picker, files copied into the session workspace) |
 | Fix layer | dsh-upstream-fixes (repairs two boot-breaking bugs in dsh-auto-approval and dsh-sidechain — **required**) |
 
 ## Quick start
