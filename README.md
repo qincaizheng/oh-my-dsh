@@ -20,7 +20,7 @@ DeepSeek Harness（DSH）一键整合包：14 组精选插件 + 开箱配置，�
 本仓库的权威安装手册是 [INSTALL.md](./INSTALL.md)。把下面这段提示词交给任意 AI / Agent 即可完成安装：
 
 ```text
-请阅读 https://github.com/qincaizheng/oh-my-dsh/INSTALL.md 并安装。
+请阅读 https://github.com/qincaizheng/oh-my-dsh/INSTALL.md，把它作为唯一权威的安装手册，在本机 DeepSeek Harness（dsh web）环境按手册完成整合包的全部安装与配置：装完所有插件、应用配置追加、执行手册中的修复与验证、重启 dsh web，不要跳过任何插件或验证步骤，最后向我汇报安装结果。
 ```
 
 ## 目录结构
