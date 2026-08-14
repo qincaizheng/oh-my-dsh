@@ -15,21 +15,12 @@ DeepSeek Harness（DSH）一键整合包：14 组精选插件 + 开箱配置，�
 | 插件管理 | plugin-console（浏览器面板管理插件安装态） |
 | 修复层 | dsh-upstream-fixes（修复 auto-approval scoped 名与 sidechain 客户端深路径 import 两个启动崩溃点，**必装**） |
 
-## 快速开始（把下面的提示词交给 AI）
+## 快速开始
 
-本仓库的权威安装手册是根目录的 [INSTALL.md](./INSTALL.md)。把下面这段提示词复制给你使用的任意 AI / Agent，它会读取手册并完成整套安装：
+本仓库的权威安装手册是 [INSTALL.md](./INSTALL.md)。把下面这段提示词交给任意 AI / Agent 即可完成安装：
 
 ```text
-请阅读本仓库根目录的 INSTALL.md（DSH 整合包安装指南），并严格按照其中的清单与步骤执行：
-
-1. 检查前置条件（dsh web 可运行、Node ≥ 20、pnpm ≥ 10、网络可达 GitHub 与 npm）；
-2. 按 §1 清单与 §2 步骤安装全部插件（npm 发布包与源码包两类，源码包先克隆再 link 挂载）；
-3. 应用 §3 的配置追加（~/.dsh/profiles/web/cordis.patch.yml：better-sidebar 挂载行 + auto/auto-review 权限预设）；
-4. 执行 §4 的三个通用坑修复（断链改指全局 DSH 安装、裸 schemastery 别名、未发布私有依赖处理）；
-5. 执行 §5 的启动前验证（组合树无 entry not found、各插件宿主模块可 import、upstream-fixes 别名就位）；
-6. 安装完成后重启 dsh web 并硬刷新浏览器，按 §8 验收清单逐项确认。
-
-任何一步失败：先对照 §6「为什么 dsh-upstream-fixes 必装」与 §9「已知风险」判断原因，再决定修复或回滚（§10），最后把结果与建议报告给用户。不要跳过验证步骤，不要省略 upstream-fixes 的别名修复。
+请阅读 https://github.com/qincaizheng/oh-my-dsh/INSTALL.md 并安装。
 ```
 
 ## 目录结构
