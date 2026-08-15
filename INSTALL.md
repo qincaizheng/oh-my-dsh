@@ -43,6 +43,8 @@ dsh plugin --profile web add @canglongcl/dsh-web-review
 dsh plugin --profile web add @zseven-w/dsh-openpencil
 dsh plugin --profile web add dsh-auto-approval
 dsh plugin --profile web add dsh-client-ui-auto-approval
+dsh plugin --profile web add @dsh-plugin/dsh-thought-buddy
+dsh plugin --profile web add @dsh-plugin/dsh-auxiliary
 ```
 
 ### 2.2 dsh-web-ui 全家桶（聚合包）
@@ -160,6 +162,14 @@ done
     - id: dsh-paste-input
       name: '@dsh-community/dsh-paste-input'
 
+# dsh-auxiliary 挂载行（无 bundle 的纯插件，必须手动 insert）
+- insert:
+    - id: dsh-auxiliary
+      name: '@dsh-plugin/dsh-auxiliary'
+      config:
+        tool:
+          enabled: true
+
 # 权限预设：补 auto / auto-review 两档
 - id: permission
   config:
@@ -234,7 +244,8 @@ cd ~/.dsh/profiles/web
 for pkg in @loserfox/git-identity dsh-at-file dsh-agent-teams \
            @canglongcl/dsh-web-review @zseven-w/dsh-openpencil @dsh-external/plugin-console \
            @deepseek-ai/dsh-toolkit dsh-better-sidebar dsh-auto-approval \
-           @dsh-external/dsh-sidechain @dsh-external/dsh-upstream-fixes; do
+           @dsh-external/dsh-sidechain @dsh-external/dsh-upstream-fixes \
+           @dsh-plugin/dsh-thought-buddy @dsh-plugin/dsh-auxiliary; do
   node --input-type=module -e "import('$pkg').then(()=>console.log('OK $pkg')).catch(e=>{console.error('FAIL $pkg', e.message); process.exit(1)})" || echo "== $pkg 加载失败 =="
 done
 
@@ -271,11 +282,14 @@ dsh web --patch /tmp/test-port.yml   # 起来后 curl http://127.0.0.1:3099/ 看
 # 重启 dsh web（Ctrl+C 后重新运行），浏览器硬刷新
 ```
 
-验收点：侧边栏出现 SSH/任务看板/新工作台（better-sidebar）；输入框 `@文件` 提及生效；`/btw 问题`、`/side 问题`、`/side list` 可用；设置→权限出现 5 档（含 Auto / Auto review）+ auto-approval 设置区；composer 旁出现 AA 芯片；网页预览 tab（web-review）可打开。
+验收点：侧边栏出现 SSH/任务看板/新工作台（better-sidebar）；输入框 `@文件` 提及生效；`/btw 问题`、`/side 问题`、`/side list` 可用；设置→权限出现 5 档（含 Auto / Auto review）+ auto-approval 设置区；composer 旁出现 AA 芯片；网页预览 tab（web-review）可打开；模型思考时出现 thought-buddy 小表情（「Deep diving...」前）；auxiliary 的 `inspect_image` 工具可用。
+
+> dsh-sidechain 默认禁用（DISABLED.md）：安装后 `/btw`、`/side` 不出现属预期，重新启用入口见 DISABLED.md。
 
 ## 9. 已知风险
 
 - 老插件（agent-teams / toolkit 系 rc.1 时代源码）已按本机 DSH rc.6 重建/链接；**升级 DSH 后需重跑 §4 的断链修复与构建**。
+- **dsh-auxiliary 的设置命名空间 `dsh-auxiliary` 不在 rc.6 的 `WEB_SETTINGS_NAMESPACES` 白名单**：设置页「辅助模型」表单不可用，配置直接写 `~/.dsh/settings.yaml` 的 `dsh-auxiliary:` 段（键名与示例见插件 README）。
 - dsh-web-ui 全家桶已适配当前 DSH 壳（compat shim 内置）；**升级 DSH 后若侧边栏入口不显示，先更新全家桶仓库（`git pull` + `pnpm -r build` + `scripts/link-profile.mjs`）再重启 dsh web**。
 - 两个目录做兼容情报：<https://github.com/AdamPlatin123/awesome-dsh-plugins>（每日兼容矩阵）、<https://github.com/0xsline/awesome-deepseek-harness>。
 

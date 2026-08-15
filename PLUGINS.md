@@ -35,6 +35,8 @@
 | dsh-openpencil | `@zseven-w/dsh-openpencil@0.1.0-rc.1` | npm | bundle |
 | dsh-auto-approval | `dsh-auto-approval@^0.1.0`（**裸名**） | npm | bundle（scoped 挂载名由 upstream-fixes 别名修复） |
 | dsh-client-ui-auto-approval | `dsh-client-ui-auto-approval@^0.1.0`（**裸名**） | npm | 纯 client 插件（无 bundle，随修复层注册） |
+| dsh-thought-buddy | `@dsh-plugin/dsh-thought-buddy@^0.1.0` | npm | bundle（思考时的小表情，localStorage 配置） |
+| dsh-auxiliary | `@dsh-plugin/dsh-auxiliary@^0.4.0` | npm | 纯插件无 bundle，**需手动 insert 行**（INSTALL.md §3）；设置页表单 rc.6 不可用，走 settings.yaml（键 `dsh-auxiliary`） |
 
 ## C. 源码 link（未发布 npm）
 
@@ -54,6 +56,6 @@
 
 ## 统计
 
-- 共 16 个依赖键包 / 16 个功能组（dsh-web-ui 全家桶合并为 1 个聚合依赖键，其 9 个功能插件仍各算 1 个功能组）。
+- 共 18 个依赖键包 / 18 个功能组（dsh-web-ui 全家桶合并为 1 个聚合依赖键，其 9 个功能插件仍各算 1 个功能组）。
 - 「挂载」为 bundle 的条目：`dsh plugin add` 后自动进 `dsh.profile.bundles`，无需其他操作。
 - 「挂载」为手动 insert 的条目（dsh-better-sidebar、dsh-paste-input）：必须在 profile `cordis.patch.yml` 写对应 insert 行（见 INSTALL.md §3），且**只写一次**。
