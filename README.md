@@ -2,7 +2,7 @@
 
 [中文](./README.zh.md) | English
 
-One-command integration pack for DeepSeek Harness (DSH): 16 curated plugin groups plus out-of-the-box configuration — the Web UI suite, a coding toolchain, the permission "auto" tier, `/btw` side-asks, and a compatibility fix layer for third-party plugins.
+One-command integration pack for DeepSeek Harness (DSH): 18 curated plugin groups plus out-of-the-box configuration — the Web UI suite, a coding toolchain, the approve-for-me auto-approval tier (codex-guardian-style review + "Approve For Me" sandbox option), and a compatibility fix layer for third-party plugins.
 
 ## What's inside
 
@@ -31,4 +31,4 @@ Read https://github.com/qincaizheng/oh-my-dsh/blob/main/INSTALL.md and treat it 
 
 - Verified against DSH 0.1.0-rc.6. Some older plugins (agent-teams / toolkit originate from the rc.1 era) were rebuilt/relinked against rc.6 — **after upgrading DSH, re-run the repairs and rebuilds in INSTALL.md §4**.
 - Third-party compatibility intelligence: <https://github.com/AdamPlatin123/awesome-dsh-plugins> (daily compatibility matrix), <https://github.com/0xsline/awesome-deepseek-harness> (hand-curated directory).
-- `dsh-upstream-fixes` is this pack's fix layer and repairs two real crash points; without it, restarting `dsh web` fails — see INSTALL.md §6.
+- `dsh-upstream-fixes` is this pack's fix layer, originally repairing two crash points from the old auto-approval / sidechain plugins; with auto-approval replaced by approve-for-me and sidechain default-disabled it is now inert, but keep it installed for compatibility — see INSTALL.md §6.

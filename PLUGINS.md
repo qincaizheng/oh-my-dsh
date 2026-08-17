@@ -33,8 +33,7 @@
 |---|---|---|---|
 | dsh-web-review | `@canglongcl/dsh-web-review@^0.1.0` | npm | bundle |
 | dsh-openpencil | `@zseven-w/dsh-openpencil@0.1.0-rc.1` | npm | bundle |
-| dsh-auto-approval | `dsh-auto-approval@^0.1.0`（**裸名**） | npm | bundle（scoped 挂载名由 upstream-fixes 别名修复） |
-| dsh-client-ui-auto-approval | `dsh-client-ui-auto-approval@^0.1.0`（**裸名**） | npm | 纯 client 插件（无 bundle，随修复层注册） |
+
 | dsh-thought-buddy | `@dsh-plugin/dsh-thought-buddy@^0.1.0` | npm | bundle（思考时的小表情，localStorage 配置） |
 | dsh-auxiliary | `@dsh-plugin/dsh-auxiliary@^0.4.0` | npm | 纯插件无 bundle，**需手动 insert 行**（INSTALL.md §3）；设置页表单 rc.6 不可用，走 settings.yaml（键 `dsh-auxiliary`） |
 
@@ -53,6 +52,8 @@
 | dsh-mcp-manager | `dsh-mcp-manager` | <https://github.com/hyqhyq3/dsh-mcp-manager> | link（lib 已提交零依赖） | bundle |
 | dsh-paste-input | `@dsh-community/dsh-paste-input` | <https://github.com/lhh010/dsh-paste-input> | link（lib 已提交零依赖） | 纯插件无 bundle，**需手动 insert 行** |
 | dsh-annotation | `@omdsh-dev/dsh-annotation` | <https://github.com/dsh-external/dsh-annotation>（现组织 omdsh-dev） | link（预构建零依赖） | bundle（**勿**再手动 insert） |
+| approve-for-me（主插件） | `dsh-plugin-approve-for-me` | <https://github.com/ZhuRuoLing/dsh-command-approve-for-me> | link（lib 已提交；peer 走 INSTALL.md §4.3 软链法） | 无 bundle，**需手动 insert 行**（INSTALL.md §3） |
+| approve-for-me-ui（前端状态行） | `dsh-client-plugin-approve-for-me` | <https://github.com/ZhuRuoLing/dsh-client-plugin-approve-for-me> | link（lib 已提交；host 仅依赖 zod，软链全局 zod） | 无 bundle，**需手动 insert 行**（INSTALL.md §3） |
 
 ## 统计
 

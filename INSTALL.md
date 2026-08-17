@@ -41,8 +41,6 @@ grep -c 'id: dsh-paste-input' ~/.dsh/profiles/web/cordis.patch.yml
 ```bash
 dsh plugin --profile web add @canglongcl/dsh-web-review
 dsh plugin --profile web add @zseven-w/dsh-openpencil
-dsh plugin --profile web add dsh-auto-approval
-dsh plugin --profile web add dsh-client-ui-auto-approval
 dsh plugin --profile web add @dsh-plugin/dsh-thought-buddy
 dsh plugin --profile web add @dsh-plugin/dsh-auxiliary
 ```
@@ -78,6 +76,8 @@ git clone --depth 1 https://github.com/LoserFox/dsh-git-identity.git   $SRC/dsh-
 git clone --depth 1 https://github.com/vlln/plugin-registry.git        $SRC/plugin-registry
 git clone --depth 1 https://github.com/omdsh-dev/dsh-toolkit.git       $SRC/dsh-toolkit
 git clone --depth 1 https://github.com/Buyi-wsgzg/dsh-sidechain.git    $SRC/dsh-sidechain
+git clone --depth 1 https://github.com/ZhuRuoLing/dsh-command-approve-for-me.git $SRC/dsh-command-approve-for-me
+git clone --depth 1 https://github.com/ZhuRuoLing/dsh-client-plugin-approve-for-me.git $SRC/dsh-client-plugin-approve-for-me
 git clone --depth 1 https://github.com/qincaizheng/dsh-upstream-fixes.git $SRC/dsh-upstream-fixes
 git clone --depth 1 https://github.com/hyqhyq3/dsh-mcp-manager.git     $SRC/dsh-mcp-manager
 git clone --depth 1 https://github.com/lhh010/dsh-paste-input.git     $SRC/dsh-paste-input
@@ -97,6 +97,11 @@ git clone --depth 1 https://github.com/dsh-external/dsh-annotation.git  $SRC/dsh
 (cd $SRC/plugin-registry/packages/plugin/console && pnpm install --config.auto-install-peers=false)
 # agent-teams（pnpm 用 --no-frozen-lockfile；其 peer 指向未发布私有包，不要整体装，只做 §4 断链修复）
 (cd $SRC/dsh-agent-teams && pnpm install --no-frozen-lockfile || true)
+# approve-for-me 主插件（lib 已提交零构建；peer 全部软链全局 rc.6，见 §4.3）
+bash <整合包工作区>/scripts/link-dsh-peers.sh $SRC/dsh-command-approve-for-me
+# approve-for-me 前端插件（host 半部仅依赖 zod）
+mkdir -p $SRC/dsh-client-plugin-approve-for-me/node_modules
+[ -e $SRC/dsh-client-plugin-approve-for-me/node_modules/zod ] || ln -s $(npm root -g)/@deepseek-ai/dsh/node_modules/zod $SRC/dsh-client-plugin-approve-for-me/node_modules/zod
 ```
 
 挂载：
@@ -113,6 +118,8 @@ dsh plugin --profile web add $SRC/dsh-upstream-fixes
 dsh plugin --profile web add $SRC/dsh-mcp-manager
 dsh plugin --profile web add $SRC/dsh-paste-input
 dsh plugin --profile web add $SRC/dsh-annotation
+dsh plugin --profile web add $SRC/dsh-command-approve-for-me
+dsh plugin --profile web add $SRC/dsh-client-plugin-approve-for-me
 
 # link: 安装不跑 postinstall —— 手动执行别名修复（同一命令可反复执行作修复）
 node $SRC/dsh-upstream-fixes/scripts/install-aliases.mjs
@@ -170,6 +177,18 @@ done
         tool:
           enabled: true
 
+# approve-for-me 挂载行（主插件：审批 answerer + 审查预设 + 沙箱「替我同意」选项）
+- insert:
+    - id: approve-for-me
+      name: 'dsh-plugin-approve-for-me'
+      config:
+        mode: review
+
+# approve-for-me-ui 挂载行（前端：会话流里的审查状态行）
+- insert:
+    - id: approve-for-me-ui
+      name: 'dsh-client-plugin-approve-for-me'
+
 # 权限预设：补 auto / auto-review 两档
 - id: permission
   config:
@@ -188,12 +207,12 @@ done
         sandbox: workspace-write
         approval: never
         name: Auto
-        description: Fully autonomous inside the workspace - no prompts, out-of-workspace writes are rejected. Pairs with the auto-approval plugin for classified allow/deny guardrails.
+        description: Fully autonomous inside the workspace - no prompts, out-of-workspace writes are rejected. For classifier-based guardrails use the approve-for-me presets.
       auto-review:
         sandbox: workspace-write
         approval: ask
         name: Auto review
-        description: The auto-approval classifier decides ordinary tool calls; escalation attempts still ask you. Every decision is audited in the session log.
+        description: Legacy preset kept for compatibility; approval behavior now comes from the approve-for-me presets (or native prompts when review mode is not active).
       danger-full-access:
         sandbox: danger-full-access
         approval: never
@@ -243,17 +262,13 @@ dsh web --dump-config 2>&1 | grep -c 'not found'
 cd ~/.dsh/profiles/web
 for pkg in @loserfox/git-identity dsh-at-file dsh-agent-teams \
            @canglongcl/dsh-web-review @zseven-w/dsh-openpencil @dsh-external/plugin-console \
-           @deepseek-ai/dsh-toolkit dsh-better-sidebar dsh-auto-approval \
-           @dsh-external/dsh-sidechain @dsh-external/dsh-upstream-fixes \
+           @deepseek-ai/dsh-toolkit dsh-better-sidebar dsh-plugin-approve-for-me \
+           dsh-client-plugin-approve-for-me @dsh-external/dsh-sidechain @dsh-external/dsh-upstream-fixes \
            @dsh-plugin/dsh-thought-buddy @dsh-plugin/dsh-auxiliary; do
   node --input-type=module -e "import('$pkg').then(()=>console.log('OK $pkg')).catch(e=>{console.error('FAIL $pkg', e.message); process.exit(1)})" || echo "== $pkg 加载失败 =="
 done
 
-# 3) upstream-fixes 的 scoped 别名已就位（缺了重启必崩，见 §6）
-ls ~/.dsh/profiles/node_modules/@deepseek-ai/dsh-auto-approval \
-   ~/.dsh/profiles/node_modules/@deepseek-ai/dsh-client-ui-auto-approval
-
-# 4)（可选）冒烟启动：不占 3080，用补丁换端口试跑
+# 3)（可选）冒烟启动：不占 3080，用补丁换端口试跑
 cat > /tmp/test-port.yml <<'EOF'
 - id: webserver
   config:
@@ -263,12 +278,14 @@ EOF
 dsh web --patch /tmp/test-port.yml   # 起来后 curl http://127.0.0.1:3099/ 看启动清单
 ```
 
-## 6. 为什么 dsh-upstream-fixes 必装（两个真实崩溃点）
+## 6. dsh-upstream-fixes（修复层，当前为惰性保险）
 
-1. **dsh-auto-approval 的 scoped 名 bug**：它的 `cordis.patch.yml` 挂载名写的是 `@deepseek-ai/dsh-auto-approval`（带 scope），但 npm 上发布的是裸名 `dsh-auto-approval`。没有修复层时，重启 `dsh web` 直接 `ERR_MODULE_NOT_FOUND` 崩掉。
-2. **dsh-sidechain 的深路径 import bug**：它的 client bundle require `@deepseek-ai/dsh-client-runtime/src/...`（不在客户端模块表里），没有修复层时 Web UI 报 `missed the module table` 加载失败。
+修复层最初修复两个真实崩溃点，现已随插件替换/禁用而失效，但保留安装以兼容历史配置：
 
-修复层做的事：`scripts/install-aliases.mjs` 在 `$DSH_HOME/profiles/node_modules` 建 scoped→裸名软链（pnpm 不管理该目录，profile 重装不丢）+ 以 `immediately` 优先级注册 client shim。**安装方式为 git clone + 本地路径 link：pnpm 对 link: 依赖不跑 postinstall，所以必须手动执行 `node <克隆目录>/scripts/install-aliases.mjs`；该命令幂等，链接失效时重跑即可。**（若改从 registry 安装，postinstall 会自动跑。）
+1. **旧 dsh-auto-approval 的 scoped 名 bug**（已移除）：它曾在 `cordis.patch.yml` 里用带 scope 的挂载名，缺修复层时重启即 `ERR_MODULE_NOT_FOUND`。该插件已被 approve-for-me 替代，此问题不再存在。
+2. **dsh-sidechain 的深路径 import bug**（默认禁用）：它的 client bundle require `@deepseek-ai/dsh-client-runtime/src/...`（不在客户端模块表里），没有修复层时 Web UI 报 `missed the module table` 加载失败。**只有重新启用 sidechain（见 DISABLED.md）时才需要修复层**。
+
+修复层做的事：`scripts/install-aliases.mjs` 在 `$DSH_HOME/profiles/node_modules` 建 scoped→裸名软链（pnpm 不管理该目录，profile 重装不丢）+ 以 `immediately` 优先级注册 client shim。**安装方式为 git clone + 本地路径 link：pnpm 对 link: 依赖不跑 postinstall，所以必须手动执行 `node <克隆目录>/scripts/install-aliases.mjs`；该命令幂等。**（若改从 registry 安装，postinstall 会自动跑。）
 
 ## 7. 可选：皮肤
 
@@ -282,7 +299,9 @@ dsh web --patch /tmp/test-port.yml   # 起来后 curl http://127.0.0.1:3099/ 看
 # 重启 dsh web（Ctrl+C 后重新运行），浏览器硬刷新
 ```
 
-验收点：侧边栏出现 SSH/任务看板/新工作台（better-sidebar）；输入框 `@文件` 提及生效；`/btw 问题`、`/side 问题`、`/side list` 可用；设置→权限出现 5 档（含 Auto / Auto review）+ auto-approval 设置区；composer 旁出现 AA 芯片；网页预览 tab（web-review）可打开；模型思考时出现 thought-buddy 小表情（「Deep diving...」前）；auxiliary 的 `inspect_image` 工具可用。
+验收点：侧边栏出现 SSH/任务看板/新工作台（better-sidebar）；输入框 `@文件` 提及生效；`/btw 问题`、`/side 问题`、`/side list` 可用；设置→权限出现 5 档；会话流出现 approve-for-me 审查状态行；沙箱权限下拉出现「替我同意 / Approve For Me」与「Approve For Me - Strict Mode」（可用 `/permission approve-for-me` 切换）；网页预览 tab（web-review）可打开；模型思考时出现 thought-buddy 小表情（「Deep diving...」前）；auxiliary 的 `inspect_image` 工具可用。
+
+> approve-for-me 的 `mode: review` 只有会话选中 approve-for-me / strict-review 预设后才调用审查模型；未选中时审批仍走原生弹窗。
 
 > dsh-sidechain 默认禁用（DISABLED.md）：安装后 `/btw`、`/side` 不出现属预期，重新启用入口见 DISABLED.md。
 
@@ -301,4 +320,6 @@ dsh plugin --profile web remove <本地路径对应的包名>  # link 插件，�
 # better-sidebar 还要删 cordis.patch.yml 里的 insert 段
 # upstream-fixes 卸载：dsh plugin --profile web remove @dsh-external/dsh-upstream-fixes
 # 再删 clone 目录与它建的 scoped 软链（~/.dsh/profiles/node_modules/@deepseek-ai/dsh-{auto-approval,client-ui-auto-approval}）
+# approve-for-me 回滚：remove 两个 link 包 + 删 cordis.patch.yml 里 approve-for-me / approve-for-me-ui 的 insert 段 + 删 clone 目录
+# 若要恢复旧 auto-approval：npm 包重新 add 两个包，并重新执行 upstream-fixes install-aliases.mjs（见 §6）
 ```
