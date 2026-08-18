@@ -43,6 +43,7 @@ dsh plugin --profile web add @canglongcl/dsh-web-review
 dsh plugin --profile web add @zseven-w/dsh-openpencil
 dsh plugin --profile web add @dsh-plugin/dsh-thought-buddy
 dsh plugin --profile web add @dsh-plugin/dsh-auxiliary
+dsh plugin --profile web add dsh-notify
 ```
 
 ### 2.2 dsh-web-ui 全家桶（聚合包）
@@ -82,6 +83,7 @@ git clone --depth 1 https://github.com/qincaizheng/dsh-upstream-fixes.git $SRC/d
 git clone --depth 1 https://github.com/hyqhyq3/dsh-mcp-manager.git     $SRC/dsh-mcp-manager
 git clone --depth 1 https://github.com/lhh010/dsh-paste-input.git     $SRC/dsh-paste-input
 git clone --depth 1 https://github.com/dsh-external/dsh-annotation.git  $SRC/dsh-annotation
+git clone --depth 1 https://github.com/mafeis/dsh-net-proxy.git        $SRC/dsh-net-proxy
 ```
 
 按需装依赖 + 构建：
@@ -102,6 +104,8 @@ bash <整合包工作区>/scripts/link-dsh-peers.sh $SRC/dsh-command-approve-for
 # approve-for-me 前端插件（host 半部仅依赖 zod）
 mkdir -p $SRC/dsh-client-plugin-approve-for-me/node_modules
 [ -e $SRC/dsh-client-plugin-approve-for-me/node_modules/zod ] || ln -s $(npm root -g)/@deepseek-ai/dsh/node_modules/zod $SRC/dsh-client-plugin-approve-for-me/node_modules/zod
+# dsh-net-proxy（lib 已提交零构建；peer 软链全局 rc.6，同 §4.3）
+bash <整合包工作区>/scripts/link-dsh-peers.sh $SRC/dsh-net-proxy
 ```
 
 挂载：
@@ -120,6 +124,7 @@ dsh plugin --profile web add $SRC/dsh-paste-input
 dsh plugin --profile web add $SRC/dsh-annotation
 dsh plugin --profile web add $SRC/dsh-command-approve-for-me
 dsh plugin --profile web add $SRC/dsh-client-plugin-approve-for-me
+dsh plugin --profile web add $SRC/dsh-net-proxy
 
 # link: 安装不跑 postinstall —— 手动执行别名修复（同一命令可反复执行作修复）
 node $SRC/dsh-upstream-fixes/scripts/install-aliases.mjs
@@ -169,13 +174,8 @@ done
     - id: dsh-paste-input
       name: '@dsh-community/dsh-paste-input'
 
-# dsh-auxiliary 挂载行（无 bundle 的纯插件，必须手动 insert）
-- insert:
-    - id: dsh-auxiliary
-      name: '@dsh-plugin/dsh-auxiliary'
-      config:
-        tool:
-          enabled: true
+# dsh-auxiliary 自 0.4.2 起内置 bundle patch，随 `dsh plugin add` 自动挂载，
+# 无需手动 insert 行（0.4.2 之前版本才需要；如已按旧手册写过 insert 行，升级后请删除该行以免重复）
 
 # approve-for-me 挂载行（主插件：审批 answerer + 审查预设 + 沙箱「替我同意」选项）
 - insert:
@@ -264,7 +264,7 @@ for pkg in @loserfox/git-identity dsh-at-file dsh-agent-teams \
            @canglongcl/dsh-web-review @zseven-w/dsh-openpencil @dsh-external/plugin-console \
            @deepseek-ai/dsh-toolkit dsh-better-sidebar dsh-plugin-approve-for-me \
            dsh-client-plugin-approve-for-me @dsh-external/dsh-sidechain @dsh-external/dsh-upstream-fixes \
-           @dsh-plugin/dsh-thought-buddy @dsh-plugin/dsh-auxiliary; do
+           @dsh-plugin/dsh-thought-buddy @dsh-plugin/dsh-auxiliary dsh-notify dsh-net-proxy; do
   node --input-type=module -e "import('$pkg').then(()=>console.log('OK $pkg')).catch(e=>{console.error('FAIL $pkg', e.message); process.exit(1)})" || echo "== $pkg 加载失败 =="
 done
 

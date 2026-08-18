@@ -33,9 +33,9 @@
 |---|---|---|---|
 | dsh-web-review | `@canglongcl/dsh-web-review@^0.1.0` | npm | bundle |
 | dsh-openpencil | `@zseven-w/dsh-openpencil@0.1.0-rc.1` | npm | bundle |
-
-| dsh-thought-buddy | `@dsh-plugin/dsh-thought-buddy@^0.1.0` | npm | bundle（思考时的小表情，localStorage 配置） |
-| dsh-auxiliary | `@dsh-plugin/dsh-auxiliary@^0.4.0` | npm | 纯插件无 bundle，**需手动 insert 行**（INSTALL.md §3）；设置页表单 rc.6 不可用，走 settings.yaml（键 `dsh-auxiliary`） |
+| dsh-thought-buddy | `@dsh-plugin/dsh-thought-buddy@^0.1.1` | npm | bundle（思考时的小表情，localStorage 配置） |
+| dsh-auxiliary | `@dsh-plugin/dsh-auxiliary@^0.4.2` | npm | bundle（0.4.2 起内置 bundle patch，**无需**手动 insert 行）；设置页表单 rc.6 不可用，走 settings.yaml（键 `dsh-auxiliary`） |
+| dsh-notify | `dsh-notify@^0.1.2` | npm | bundle（会话完成 Windows toast + 音效通知，仅后台触发，音量可调） |
 
 ## C. 源码 link（未发布 npm）
 
@@ -54,9 +54,10 @@
 | dsh-annotation | `@omdsh-dev/dsh-annotation` | <https://github.com/dsh-external/dsh-annotation>（现组织 omdsh-dev） | link（预构建零依赖） | bundle（**勿**再手动 insert） |
 | approve-for-me（主插件） | `dsh-plugin-approve-for-me` | <https://github.com/ZhuRuoLing/dsh-command-approve-for-me> | link（lib 已提交；peer 走 INSTALL.md §4.3 软链法） | 无 bundle，**需手动 insert 行**（INSTALL.md §3） |
 | approve-for-me-ui（前端状态行） | `dsh-client-plugin-approve-for-me` | <https://github.com/ZhuRuoLing/dsh-client-plugin-approve-for-me> | link（lib 已提交；host 仅依赖 zod，软链全局 zod） | 无 bundle，**需手动 insert 行**（INSTALL.md §3） |
+| dsh-net-proxy | `dsh-net-proxy` | <https://github.com/mafeis/dsh-net-proxy> | link（lib 已提交；peer 走 INSTALL.md §4.3 软链法） | bundle（agent 网络请求走 HTTP/SOCKS5 代理，配置存 `~/.dsh/net-proxy.json`，设置页即时生效） |
 
 ## 统计
 
-- 共 18 个依赖键包 / 18 个功能组（dsh-web-ui 全家桶合并为 1 个聚合依赖键，其 9 个功能插件仍各算 1 个功能组）。
+- 共 20 个依赖键包 / 20 个功能组（dsh-web-ui 全家桶合并为 1 个聚合依赖键，其 9 个功能插件仍各算 1 个功能组）。
 - 「挂载」为 bundle 的条目：`dsh plugin add` 后自动进 `dsh.profile.bundles`，无需其他操作。
 - 「挂载」为手动 insert 的条目（dsh-better-sidebar、dsh-paste-input）：必须在 profile `cordis.patch.yml` 写对应 insert 行（见 INSTALL.md §3），且**只写一次**。
