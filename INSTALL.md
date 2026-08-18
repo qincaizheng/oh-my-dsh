@@ -1,13 +1,24 @@
 # DSH 整合包 · 安装指南（给执行安装的模型/Agent 看）
 
 > 目标读者：负责部署本整合包的 AI 模型。本文是安装手册（从哪装、怎么装、怎么验证）；**插件清单的唯一权威是 [PLUGINS.md](./PLUGINS.md)**。
-> 目标环境：已装 DSH（`dsh web` 可跑），Node ≥ 20，pnpm ≥ 10，web profile 位于 `~/.dsh/profiles/web/`。
+> 目标环境：已装 DSH，Node ≥ 20，pnpm ≥ 10；默认 web profile 位于 `~/.dsh/profiles/oh-my-dsh/`，**整合包安装进独立的 `oh-my-dsh` profile（`~/.dsh/profiles/oh-my-dsh/`）**，由 §0 第 0 步从默认 profile 复制创建。
 
 ## 0. 总原则
 
-1. 所有安装统一走 `dsh plugin --profile web add <包名|本地路径>`（底层转发 pnpm，装完自动把带 `dsh.bundle` 声明的包 reconcile 进 `dsh.profile.bundles` 层栈）。
-2. 纯 cordis 插件（无 `dsh.bundle`，如 dsh-better-sidebar）必须额外在 profile 的 `cordis.patch.yml` 写 insert 挂载行。
-3. **装完全部插件后必须重启 `dsh web` 并硬刷新浏览器**（Cmd/Ctrl+Shift+R）才生效。
+0. **整合包安装进独立的 `oh-my-dsh` profile，不动用户默认的 `web` profile**。先从默认 profile 复制出独立目录（一次性；已存在则跳过复制，直接按 §1 对比）：
+
+   ```bash
+   # 复制默认 web profile 为 oh-my-dsh（含基础配置；macOS 用 -Rc 克隆，其他系统 cp -a）
+   [ -d ~/.dsh/profiles/oh-my-dsh ] || cp -Rc ~/.dsh/profiles/web ~/.dsh/profiles/oh-my-dsh
+   # 修正 profile 包名
+   node -e "const f=process.env.HOME+'/.dsh/profiles/oh-my-dsh/package.json',d=require(f);d.name='dsh-profile-oh-my-dsh';require('fs').writeFileSync(f,JSON.stringify(d,null,2)+'\n')"
+   ```
+
+   启动方式随之改变：**`dsh web` 永远等价于 `dsh --profile web`**（boot 默认 profile），整合包环境用 `dsh --profile oh-my-dsh` 启动；`dsh web --profile xxx` 这种写法不存在。本手册所有命令都以 `oh-my-dsh` 为目标 profile。
+
+1. 所有安装统一走 `dsh plugin --profile oh-my-dsh add <包名|本地路径>`（底层转发 pnpm，装完自动把带 `dsh.bundle` 声明的包 reconcile 进 `dsh.profile.bundles` 层栈）。
+2. 纯 cordis 插件（无 `dsh.bundle`，如 dsh-paste-input、approve-for-me 对）必须额外在 profile 的 `cordis.patch.yml` 写 insert 挂载行。
+3. **装完全部插件后必须重启并硬刷新浏览器**（Cmd/Ctrl+Shift+R）才生效；重启 = 停掉旧进程后 `dsh --profile oh-my-dsh`。
 4. 源码插件常见三个坑，通用修复见 §4。
 5. **幂等安装**：每次执行先按 §1 对比本机已装插件，**只安装缺失项**；已安装的条目一律跳过，不重装、不重复写配置。
 6. **禁用清单**：每次安装/更新后按 §2.4 处理 [DISABLED.md](./DISABLED.md)——清单内已安装的条目写禁用行，并在最终汇报里告知用户重新启用入口。
@@ -20,16 +31,21 @@
 
 ```bash
 # 1) 本机已装插件集合（profile 依赖键，与 PLUGINS.md 的「包名」列一一对应）
-node -e "console.log(Object.keys(require(process.env.HOME + '/.dsh/profiles/web/package.json').dependencies ?? {}).sort().join('\n'))"
+node -e "console.log(Object.keys(require(process.env.HOME + '/.dsh/profiles/oh-my-dsh/package.json').dependencies ?? {}).sort().join('\n'))"
 
 # 2) 逐行对照 PLUGINS.md：
 #    - 已安装的条目 → 跳过（不重装、不改配置、不重写 insert 行）
 #    - 缺失的条目   → 记下它的「安装方式」，跳到 §2 执行对应命令
-# 3) 需要手动 insert 挂载行的插件（PLUGINS.md「挂载」列标出：dsh-better-sidebar / dsh-paste-input）
+# 3) 需要手动 insert 挂载行的插件（PLUGINS.md「挂载」列标出：dsh-paste-input、approve-for-me 对）
 #    还要确认挂载行是否已存在，计数为 0 才追加：
-grep -c 'id: better-sidebar' ~/.dsh/profiles/web/cordis.patch.yml
-grep -c 'id: dsh-paste-input' ~/.dsh/profiles/web/cordis.patch.yml
+grep -c 'id: dsh-paste-input' ~/.dsh/profiles/oh-my-dsh/cordis.patch.yml
 # 重复 insert 会导致启动报错，务必只写一次。
+# 4) 迁移检查：better-sidebar / dsh-auxiliary 已改走 bundle 自动挂载，
+#    不得残留旧手动 insert 行，否则启动报 duplicate loader entry id。
+#    注意：DISABLED.md 的禁用行也含 `id: better-sidebar` 字样，属正常；
+#    要确认的是 insert 块里没有它们（下列计数应为 0）：
+grep -B1 'id: better-sidebar' ~/.dsh/profiles/oh-my-dsh/cordis.patch.yml | grep -c insert
+grep -B1 'id: dsh-auxiliary' ~/.dsh/profiles/oh-my-dsh/cordis.patch.yml | grep -c insert
 ```
 
 ## 2. 安装步骤
@@ -39,19 +55,22 @@ grep -c 'id: dsh-paste-input' ~/.dsh/profiles/web/cordis.patch.yml
 ### 2.1 npm 插件
 
 ```bash
-dsh plugin --profile web add @canglongcl/dsh-web-review
-dsh plugin --profile web add @zseven-w/dsh-openpencil
-dsh plugin --profile web add @dsh-plugin/dsh-thought-buddy
-dsh plugin --profile web add @dsh-plugin/dsh-auxiliary
-dsh plugin --profile web add dsh-notify
+dsh plugin --profile oh-my-dsh add @canglongcl/dsh-web-review
+dsh plugin --profile oh-my-dsh add @zseven-w/dsh-openpencil
+dsh plugin --profile oh-my-dsh add @dsh-plugin/dsh-thought-buddy
+dsh plugin --profile oh-my-dsh add @dsh-plugin/dsh-auxiliary
+dsh plugin --profile oh-my-dsh add dsh-notify
+dsh plugin --profile oh-my-dsh add dsh-better-sidebar
 ```
+
+> dsh-better-sidebar 自 0.12.x 起发布 npm 且内置 bundle patch（装完自动挂载）。源码调试才需要按 §2.3 link 旧流程（clone <https://github.com/omdsh-dev/DSH-better-sidebar> + `pnpm install --no-frozen-lockfile` + `dsh plugin add <路径>`）。**迁移注意：若 profile `cordis.patch.yml` 残留旧手动 insert 行（`id: better-sidebar`），必须删除该行**——bundle 已自动挂载，两者并存会启动报错 `duplicate loader entry id: better-sidebar`。
 
 ### 2.2 dsh-web-ui 全家桶（聚合包）
 
 推荐 npm 一键安装（上游已发布到 `@linxin666` scope，一个依赖键装齐 9 个功能插件 + 皮肤 + compat shim）：
 
 ```bash
-dsh plugin --profile web add @linxin666/dsh-web-ui-all
+dsh plugin --profile oh-my-dsh add @linxin666/dsh-web-ui-all
 ```
 
 > 首次安装若提示 `ERR_PNPM_IGNORED_BUILDS`（pnpm 拒绝依赖构建脚本），按提示把 `cloudflared` / `cpu-features` / `ssh2` 加入 profile 的 `pnpm-workspace.yaml` 的 `allowBuilds` 后重跑即可。
@@ -63,14 +82,13 @@ SRC=~/.dsh/plugins
 git clone https://github.com/zhu1090093659/dsh-web-ui.git $SRC/dsh-web-ui
 (cd $SRC/dsh-web-ui && pnpm install --no-frozen-lockfile && pnpm -r build)
 node $SRC/dsh-web-ui/scripts/link-profile.mjs   # 把子包链接进 profile 命名空间
-dsh plugin --profile web add link:$SRC/dsh-web-ui/packages/dsh-web-ui-all
+dsh plugin --profile oh-my-dsh add link:$SRC/dsh-web-ui/packages/dsh-web-ui-all
 ```
 
 ### 2.3 源码插件（通用流程）
 
 ```bash
 SRC=~/.dsh/plugins
-git clone --depth 1 https://github.com/omdsh-dev/DSH-better-sidebar.git $SRC/DSH-better-sidebar
 git clone --depth 1 https://github.com/omdsh-dev/dsh-at-file.git       $SRC/dsh-at-file
 git clone --depth 1 https://github.com/NanmiCoder/dsh-agent-teams.git  $SRC/dsh-agent-teams
 git clone --depth 1 https://github.com/LoserFox/dsh-git-identity.git   $SRC/dsh-git-identity
@@ -89,8 +107,6 @@ git clone --depth 1 https://github.com/mafeis/dsh-net-proxy.git        $SRC/dsh-
 按需装依赖 + 构建：
 
 ```bash
-# better-sidebar（pnpm install 会跑 prepare 自动构建）
-(cd $SRC/DSH-better-sidebar && pnpm install --no-frozen-lockfile)
 # sidechain（构建 + 裸 schemastery 别名，见 §4）
 (cd $SRC/dsh-sidechain && pnpm install --no-frozen-lockfile && pnpm build)
 # toolkit（清掉上游 lockfile 再装，避免 404；再构建全部子包）
@@ -111,20 +127,19 @@ bash <整合包工作区>/scripts/link-dsh-peers.sh $SRC/dsh-net-proxy
 挂载：
 
 ```bash
-dsh plugin --profile web add $SRC/DSH-better-sidebar
-dsh plugin --profile web add $SRC/dsh-at-file
-dsh plugin --profile web add $SRC/dsh-agent-teams
-dsh plugin --profile web add $SRC/dsh-git-identity
-dsh plugin --profile web add $SRC/plugin-registry/packages/plugin/console
-dsh plugin --profile web add $SRC/dsh-toolkit
-dsh plugin --profile web add $SRC/dsh-sidechain
-dsh plugin --profile web add $SRC/dsh-upstream-fixes
-dsh plugin --profile web add $SRC/dsh-mcp-manager
-dsh plugin --profile web add $SRC/dsh-paste-input
-dsh plugin --profile web add $SRC/dsh-annotation
-dsh plugin --profile web add $SRC/dsh-command-approve-for-me
-dsh plugin --profile web add $SRC/dsh-client-plugin-approve-for-me
-dsh plugin --profile web add $SRC/dsh-net-proxy
+dsh plugin --profile oh-my-dsh add $SRC/dsh-at-file
+dsh plugin --profile oh-my-dsh add $SRC/dsh-agent-teams
+dsh plugin --profile oh-my-dsh add $SRC/dsh-git-identity
+dsh plugin --profile oh-my-dsh add $SRC/plugin-registry/packages/plugin/console
+dsh plugin --profile oh-my-dsh add $SRC/dsh-toolkit
+dsh plugin --profile oh-my-dsh add $SRC/dsh-sidechain
+dsh plugin --profile oh-my-dsh add $SRC/dsh-upstream-fixes
+dsh plugin --profile oh-my-dsh add $SRC/dsh-mcp-manager
+dsh plugin --profile oh-my-dsh add $SRC/dsh-paste-input
+dsh plugin --profile oh-my-dsh add $SRC/dsh-annotation
+dsh plugin --profile oh-my-dsh add $SRC/dsh-command-approve-for-me
+dsh plugin --profile oh-my-dsh add $SRC/dsh-client-plugin-approve-for-me
+dsh plugin --profile oh-my-dsh add $SRC/dsh-net-proxy
 
 # link: 安装不跑 postinstall —— 手动执行别名修复（同一命令可反复执行作修复）
 node $SRC/dsh-upstream-fixes/scripts/install-aliases.mjs
@@ -132,42 +147,47 @@ node $SRC/dsh-upstream-fixes/scripts/install-aliases.mjs
 
 ### 2.4 禁用清单处理（每次安装/更新后执行）
 
-先读 [DISABLED.md](./DISABLED.md) 的禁用清单。对清单里每条（把表格「插件 id」列逐个代入；当前清单：`ui-dsh-aionui-panel`、`live-stats`、`dsh-sidechain`）：检查本机组合树里是否存在对应 id（存在且未禁用才需要处理；插件已被卸载的不存在，跳过）：
+先读 [DISABLED.md](./DISABLED.md) 的禁用清单。对清单里每条（把表格「插件 id」列逐个代入；当前清单：`web-ui-dsh-aionui-panel`、`web-ui-live-stats`、`dsh-sidechain`、`web-ui-describe-image`、`better-sidebar`）：检查本机组合树里是否存在对应 id（存在且未禁用才需要处理；插件已被卸载的不存在，跳过；`better-sidebar` 仅在有独立安装时存在）：
 
 ```bash
-for id in ui-dsh-aionui-panel live-stats dsh-sidechain; do
+for id in web-ui-dsh-aionui-panel web-ui-live-stats dsh-sidechain web-ui-describe-image better-sidebar; do
   echo "== $id =="
-  dsh web --dump-config 2>&1 | grep "id: $id"
+  dsh --profile oh-my-dsh --dump-config 2>&1 | grep "id: $id"
 done
 ```
 
-存在 → 向 `~/.dsh/profiles/web/cordis.patch.yml` **末尾**追加该条目的禁用行。幂等：追加前先确认该 id 尚无 `disabled: true` 行（`grep -A1 'id: <条目id>' ~/.dsh/profiles/web/cordis.patch.yml` 输出含 `disabled: true` 即已处理，跳过）：
+存在 → 向 `~/.dsh/profiles/oh-my-dsh/cordis.patch.yml` **末尾**追加该条目的禁用行。幂等：追加前先确认该 id 尚无 `disabled: true` 行（`grep -A1 'id: <条目id>' ~/.dsh/profiles/oh-my-dsh/cordis.patch.yml` 输出含 `disabled: true` 即已处理，跳过）：
 
 ```yaml
 # 禁用清单（DISABLED.md）：默认禁用，重新启用入口见该文件
-- id: ui-dsh-aionui-panel
+- id: web-ui-dsh-aionui-panel
   disabled: true
 
-- id: live-stats
+- id: web-ui-live-stats
   disabled: true
 
 - id: dsh-sidechain
   disabled: true
+
+- id: web-ui-describe-image
+  disabled: true
+
+- id: better-sidebar
+  disabled: true
 ```
 
-全部条目处理完后，**最终汇报必须包含**：被默认禁用了哪些插件、每个插件的重新启用入口（见 DISABLED.md「重新启用入口」列）。重新启用 = 删除对应禁用行后重启 `dsh web`。
+全部条目处理完后，**最终汇报必须包含**：被默认禁用了哪些插件、每个插件的重新启用入口（见 DISABLED.md「重新启用入口」列）。重新启用 = 删除对应禁用行后重启 `dsh --profile oh-my-dsh`。
 
 ## 3. 配置文件追加（一次性、幂等）
 
 > 追加前先按 §1 第 3 步 grep 检查：挂载行计数为 0 才追加；权限预设若已存在同名条目也不要重复追加。
 
-向 `~/.dsh/profiles/web/cordis.patch.yml` 追加（保留已有的 webserver 行）：
+向 `~/.dsh/profiles/oh-my-dsh/cordis.patch.yml` 追加（保留已有的 webserver 行）：
 
 ```yaml
-# better-sidebar 挂载行（纯 cordis 插件必须）
-- insert:
-    - id: better-sidebar
-      name: 'dsh-better-sidebar'
+# better-sidebar 自 0.12.x 起内置 bundle patch，随 `dsh plugin add` 自动挂载，
+# 无需手动 insert 行；如已按旧手册写过 insert 行（id: better-sidebar），
+# 必须删除该行——两者并存会启动报错 duplicate loader entry id: better-sidebar
 
 # dsh-paste-input 挂载行（纯插件无 bundle，同样必须）
 - insert:
@@ -256,11 +276,11 @@ ln -sfn "$GLOBAL/schemastery" "$SRC/dsh-sidechain/node_modules/schemastery"
 
 ```bash
 # 1) 组合树无 "entry not found"（仅皮肤警告可忽略）
-dsh web --dump-config 2>&1 | grep -c 'not found'
+dsh --profile oh-my-dsh --dump-config 2>&1 | grep -c 'not found'
 
 # 2) 每个新插件宿主模块能 import
-cd ~/.dsh/profiles/web
-for pkg in @loserfox/git-identity dsh-at-file dsh-agent-teams \
+cd ~/.dsh/profiles/oh-my-dsh
+for pkg in @loserfox/git-identity dsh-at-file @nanmicoder/dsh-agent-teams \
            @canglongcl/dsh-web-review @zseven-w/dsh-openpencil @dsh-external/plugin-console \
            @deepseek-ai/dsh-toolkit dsh-better-sidebar dsh-plugin-approve-for-me \
            dsh-client-plugin-approve-for-me @dsh-external/dsh-sidechain @dsh-external/dsh-upstream-fixes \
@@ -275,7 +295,7 @@ cat > /tmp/test-port.yml <<'EOF'
     host: 127.0.0.1
     port: 3099
 EOF
-dsh web --patch /tmp/test-port.yml   # 起来后 curl http://127.0.0.1:3099/ 看启动清单
+dsh --profile oh-my-dsh --patch /tmp/test-port.yml   # 起来后 curl http://127.0.0.1:3099/ 看启动清单
 ```
 
 ## 6. dsh-upstream-fixes（修复层，当前为惰性保险）
@@ -289,14 +309,14 @@ dsh web --patch /tmp/test-port.yml   # 起来后 curl http://127.0.0.1:3099/ 看
 
 ## 7. 可选：皮肤
 
-皮肤随聚合包内置（dsh-skins：qq98/ths/xp/blue-fantasy/dragon-heir/minecraft/whale-song/miku/trading），无需单独安装，在 GUI「皮肤中心」（skin-center）内切换即可。
+皮肤随聚合包内置（dsh-skins：qq98/ths/xp/blue-fantasy/dragon-heir/minecraft/whale-song/miku/trading，0.1.20 起新增 harbor/maid-atelier/matrix/whale-mom），无需单独安装，在 GUI「皮肤中心」（skin-center）内切换即可。聚合包 0.1.20 起单个皮肤包不再声明 `dsh.bundle`，profile 里若残留旧独立皮肤依赖键（如 `@linxin666/dsh-client-ui-skin-blue-fantasy`）需 `dsh plugin remove` 掉，否则启动报 `declares no dsh.bundle`。
 
 旧版 `dsh-skin` CLI 已废弃。若全局 `~/.dsh/cordis.patch.yml` 残留旧 CLI 生成的皮肤管理块（`# --- dsh-skin managed ---` 段），可整块删除——它只会产生 "entry not found" 警告；皮肤切换由聚合包的皮肤中心接管。
 
 ## 8. 激活与验收
 
 ```bash
-# 重启 dsh web（Ctrl+C 后重新运行），浏览器硬刷新
+# 重启整合包 profile（Ctrl+C 后重新运行 `dsh --profile oh-my-dsh`），浏览器硬刷新
 ```
 
 验收点：侧边栏出现 SSH/任务看板/新工作台（better-sidebar）；输入框 `@文件` 提及生效；`/btw 问题`、`/side 问题`、`/side list` 可用；设置→权限出现 5 档；会话流出现 approve-for-me 审查状态行；沙箱权限下拉出现「替我同意 / Approve For Me」与「Approve For Me - Strict Mode」（可用 `/permission approve-for-me` 切换）；网页预览 tab（web-review）可打开；模型思考时出现 thought-buddy 小表情（「Deep diving...」前）；auxiliary 的 `inspect_image` 工具可用。
@@ -309,16 +329,16 @@ dsh web --patch /tmp/test-port.yml   # 起来后 curl http://127.0.0.1:3099/ 看
 
 - 老插件（agent-teams / toolkit 系 rc.1 时代源码）已按本机 DSH rc.6 重建/链接；**升级 DSH 后需重跑 §4 的断链修复与构建**。
 - **dsh-auxiliary 的设置命名空间 `dsh-auxiliary` 不在 rc.6 的 `WEB_SETTINGS_NAMESPACES` 白名单**：设置页「辅助模型」表单不可用，配置直接写 `~/.dsh/settings.yaml` 的 `dsh-auxiliary:` 段（键名与示例见插件 README）。
-- dsh-web-ui 全家桶已适配当前 DSH 壳（compat shim 内置）；**升级 DSH 后若侧边栏入口不显示，先更新全家桶仓库（`git pull` + `pnpm -r build` + `scripts/link-profile.mjs`）再重启 dsh web**。
+- dsh-web-ui 全家桶已适配当前 DSH 壳（compat shim 内置）；**升级 DSH 后若侧边栏入口不显示，先更新全家桶仓库（`git pull` + `pnpm -r build` + `scripts/link-profile.mjs`）再重启 `dsh --profile oh-my-dsh`**。
 - 两个目录做兼容情报：<https://github.com/AdamPlatin123/awesome-dsh-plugins>（每日兼容矩阵）、<https://github.com/0xsline/awesome-deepseek-harness>。
 
 ## 10. 卸载/回滚
 
 ```bash
-dsh plugin --profile web remove <包名>          # npm/裸名插件
-dsh plugin --profile web remove <本地路径对应的包名>  # link 插件，包名见 profile package.json
-# better-sidebar 还要删 cordis.patch.yml 里的 insert 段
-# upstream-fixes 卸载：dsh plugin --profile web remove @dsh-external/dsh-upstream-fixes
+dsh plugin --profile oh-my-dsh remove <包名>          # npm/裸名插件
+dsh plugin --profile oh-my-dsh remove <本地路径对应的包名>  # link 插件，包名见 profile package.json
+# dsh-paste-input 还要删 cordis.patch.yml 里的 insert 段
+# upstream-fixes 卸载：dsh plugin --profile oh-my-dsh remove @dsh-external/dsh-upstream-fixes
 # 再删 clone 目录与它建的 scoped 软链（~/.dsh/profiles/node_modules/@deepseek-ai/dsh-{auto-approval,client-ui-auto-approval}）
 # approve-for-me 回滚：remove 两个 link 包 + 删 cordis.patch.yml 里 approve-for-me / approve-for-me-ui 的 insert 段 + 删 clone 目录
 # 若要恢复旧 auto-approval：npm 包重新 add 两个包，并重新执行 upstream-fixes install-aliases.mjs（见 §6）
