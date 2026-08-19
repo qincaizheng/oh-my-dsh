@@ -61,6 +61,7 @@ dsh plugin --profile oh-my-dsh add @dsh-plugin/dsh-thought-buddy
 dsh plugin --profile oh-my-dsh add @dsh-plugin/dsh-auxiliary
 dsh plugin --profile oh-my-dsh add dsh-notify
 dsh plugin --profile oh-my-dsh add dsh-better-sidebar
+dsh plugin --profile oh-my-dsh add dsh-code-review
 ```
 
 > dsh-better-sidebar 自 0.12.x 起发布 npm 且内置 bundle patch（装完自动挂载）。源码调试才需要按 §2.3 link 旧流程（clone <https://github.com/omdsh-dev/DSH-better-sidebar> + `pnpm install --no-frozen-lockfile` + `dsh plugin add <路径>`）。**迁移注意：若 profile `cordis.patch.yml` 残留旧手动 insert 行（`id: better-sidebar`），必须删除该行**——bundle 已自动挂载，两者并存会启动报错 `duplicate loader entry id: better-sidebar`。
@@ -284,7 +285,7 @@ for pkg in @loserfox/git-identity dsh-at-file @nanmicoder/dsh-agent-teams \
            @canglongcl/dsh-web-review @zseven-w/dsh-openpencil @dsh-external/plugin-console \
            @deepseek-ai/dsh-toolkit dsh-better-sidebar dsh-plugin-approve-for-me \
            dsh-client-plugin-approve-for-me @dsh-external/dsh-sidechain @dsh-external/dsh-upstream-fixes \
-           @dsh-plugin/dsh-thought-buddy @dsh-plugin/dsh-auxiliary dsh-notify dsh-net-proxy; do
+           @dsh-plugin/dsh-thought-buddy @dsh-plugin/dsh-auxiliary dsh-notify dsh-net-proxy dsh-code-review; do
   node --input-type=module -e "import('$pkg').then(()=>console.log('OK $pkg')).catch(e=>{console.error('FAIL $pkg', e.message); process.exit(1)})" || echo "== $pkg 加载失败 =="
 done
 
@@ -319,7 +320,7 @@ dsh --profile oh-my-dsh --patch /tmp/test-port.yml   # 起来后 curl http://127
 # 重启整合包 profile（Ctrl+C 后重新运行 `dsh --profile oh-my-dsh`），浏览器硬刷新
 ```
 
-验收点：侧边栏出现 SSH/任务看板/新工作台（better-sidebar）；输入框 `@文件` 提及生效；`/btw 问题`、`/side 问题`、`/side list` 可用；设置→权限出现 5 档；会话流出现 approve-for-me 审查状态行；沙箱权限下拉出现「替我同意 / Approve For Me」与「Approve For Me - Strict Mode」（可用 `/permission approve-for-me` 切换）；网页预览 tab（web-review）可打开；模型思考时出现 thought-buddy 小表情（「Deep diving...」前）；auxiliary 的 `inspect_image` 工具可用。
+验收点：侧边栏出现 SSH/任务看板/新工作台（better-sidebar）；输入框 `@文件` 提及生效；`/btw 问题`、`/side 问题`、`/side list` 可用；设置→权限出现 5 档；会话流出现 approve-for-me 审查状态行；沙箱权限下拉出现「替我同意 / Approve For Me」与「Approve For Me - Strict Mode」（可用 `/permission approve-for-me` 切换）；网页预览 tab（web-review）可打开；模型思考时出现 thought-buddy 小表情（「Deep diving...」前）；auxiliary 的 `inspect_image` 工具可用；会话工具栏出现 code-review 变更审查入口，完成回合后可在侧栏查看逐文件 diff。
 
 > approve-for-me 的 `mode: review` 只有会话选中 approve-for-me / strict-review 预设后才调用审查模型；未选中时审批仍走原生弹窗。
 

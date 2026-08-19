@@ -44,6 +44,7 @@
 | dsh-auxiliary | `@dsh-plugin/dsh-auxiliary@^0.4.2` | npm | bundle（0.4.2 起内置 bundle patch，**无需**手动 insert 行）；设置页表单 rc.6 不可用，走 settings.yaml（键 `dsh-auxiliary`） |
 | dsh-notify | `dsh-notify@^0.1.2` | npm | bundle（会话完成 Windows toast + 音效通知，仅后台触发，音量可调） |
 | dsh-better-sidebar | `dsh-better-sidebar@^0.13.0` | npm（推荐）或仓库 link | bundle（0.12.x 起内置 bundle patch；**若 profile 残留旧手动 insert 行必须删除**，否则重复挂载启动报错） |
+| dsh-code-review | `dsh-code-review@^0.1.0` | npm | bundle（Codex 式逐回合变更摘要 + 可拖拽审查侧栏 + 语法高亮 diff + 保护性撤销） |
 
 ## C. 源码 link（未发布 npm）
 
@@ -65,6 +66,6 @@
 
 ## 统计
 
-- 共 20 个依赖键包 / 24 个功能组（dsh-web-ui 全家桶合并为 1 个聚合依赖键；其内含功能插件 0.1.20 起为 14 个——新增 community-plugins / skill-explorer / liangshen / describe-image / 内置挂载 better-sidebar，各算 1 个功能组，describe-image 因与 dsh-auxiliary 重名默认禁用）。
+- 共 21 个依赖键包 / 25 个功能组（dsh-web-ui 全家桶合并为 1 个聚合依赖键；其内含功能插件 0.1.20 起为 14 个——新增 community-plugins / skill-explorer / liangshen / describe-image / 内置挂载 better-sidebar，各算 1 个功能组，describe-image 因与 dsh-auxiliary 重名默认禁用）。
 - 「挂载」为 bundle 的条目：`dsh plugin add` 后自动进 `dsh.profile.bundles`，无需其他操作。
 - 「挂载」为手动 insert 的条目（dsh-paste-input、approve-for-me 主/前端插件）：必须在 profile `cordis.patch.yml` 写对应 insert 行（见 INSTALL.md §3），且**只写一次**。
