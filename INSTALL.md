@@ -61,7 +61,7 @@ dsh plugin --profile oh-my-dsh add @dsh-plugin/dsh-thought-buddy
 dsh plugin --profile oh-my-dsh add @dsh-plugin/dsh-auxiliary
 dsh plugin --profile oh-my-dsh add dsh-notify
 dsh plugin --profile oh-my-dsh add dsh-better-sidebar
-dsh plugin --profile oh-my-dsh add dsh-code-review
+dsh plugin --profile oh-my-dsh add @dsh-plugin/dsh-code-review
 ```
 
 > dsh-better-sidebar 自 0.12.x 起发布 npm 且内置 bundle patch（装完自动挂载）。源码调试才需要按 §2.3 link 旧流程（clone <https://github.com/omdsh-dev/DSH-better-sidebar> + `pnpm install --no-frozen-lockfile` + `dsh plugin add <路径>`）。**迁移注意：若 profile `cordis.patch.yml` 残留旧手动 insert 行（`id: better-sidebar`），必须删除该行**——bundle 已自动挂载，两者并存会启动报错 `duplicate loader entry id: better-sidebar`。
@@ -285,7 +285,7 @@ for pkg in @loserfox/git-identity dsh-at-file @nanmicoder/dsh-agent-teams \
            @canglongcl/dsh-web-review @zseven-w/dsh-openpencil @dsh-external/plugin-console \
            @deepseek-ai/dsh-toolkit dsh-better-sidebar dsh-plugin-approve-for-me \
            dsh-client-plugin-approve-for-me @dsh-external/dsh-sidechain @dsh-external/dsh-upstream-fixes \
-           @dsh-plugin/dsh-thought-buddy @dsh-plugin/dsh-auxiliary dsh-notify dsh-net-proxy dsh-code-review; do
+           @dsh-plugin/dsh-thought-buddy @dsh-plugin/dsh-auxiliary dsh-notify dsh-net-proxy @dsh-plugin/dsh-code-review; do
   node --input-type=module -e "import('$pkg').then(()=>console.log('OK $pkg')).catch(e=>{console.error('FAIL $pkg', e.message); process.exit(1)})" || echo "== $pkg 加载失败 =="
 done
 

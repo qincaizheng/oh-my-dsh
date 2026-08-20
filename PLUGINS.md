@@ -44,7 +44,7 @@
 | dsh-auxiliary | `@dsh-plugin/dsh-auxiliary@^0.4.2` | npm | bundle（0.4.2 起内置 bundle patch，**无需**手动 insert 行）；设置页表单 rc.6 不可用，走 settings.yaml（键 `dsh-auxiliary`） |
 | dsh-notify | `dsh-notify@^0.1.2` | npm | bundle（会话完成 Windows toast + 音效通知，仅后台触发，音量可调） |
 | dsh-better-sidebar | `dsh-better-sidebar@^0.13.0` | npm（推荐）或仓库 link | bundle（0.12.x 起内置 bundle patch；**若 profile 残留旧手动 insert 行必须删除**，否则重复挂载启动报错） |
-| dsh-code-review | `dsh-code-review@^0.1.0` | npm | bundle（Codex 式逐回合变更摘要 + 可拖拽审查侧栏 + 语法高亮 diff + 保护性撤销） |
+| dsh-code-review | `@dsh-plugin/dsh-code-review@^0.2.0` | npm | bundle（Codex 式逐回合变更摘要 + 可拖拽审查侧栏 + 语法高亮 diff + 保护性撤销；0.2.0 起改名 `@dsh-plugin/` scope，旧 0.1.0 裸名包（agent preset 插件）已废弃） |
 
 ## C. 源码 link（未发布 npm）
 
